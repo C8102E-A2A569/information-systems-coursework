@@ -29,11 +29,6 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    public String getRole() {
-//        TODO: Изменить, когда появятся роли
-        return "ROLE_ADMIN";
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 //        TODO: Изменить, когда появятся роли
