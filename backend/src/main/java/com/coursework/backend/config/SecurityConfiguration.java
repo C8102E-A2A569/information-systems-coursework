@@ -41,6 +41,7 @@ public class SecurityConfiguration {
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
+// TODO: Изменить доступ
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/user/**", "/admin/**", "/route/**", "/route/add/file", "/func/**", "/log/**", "/person/**", "/movie/**", "/file/**").authenticated()
