@@ -17,42 +17,22 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-
-    //    @Value("${token.signing.key}")
     private String jwtSigningKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    /**
-     * Извлечение имени пользователя из токена
-     *
-     * @param token токен
-     * @return имя пользователя
-     */
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Генерация токена
-     *
-     * @param userDetails данные пользователя
-     * @return токен
-     */
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("id", customUserDetails.getLogin());
-//            claims.put("role", customUserDetails.getRole());
+
         }
         return generateToken(claims, userDetails);
     }
 
-    /**
-     * Проверка токена на валидность
-     *
-     * @param token       токен
-     * @param userDetails данные пользователя
-     * @return true, если токен валиден
-     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -71,13 +51,7 @@ public class JwtService {
         return claimsResolvers.apply(claims);
     }
 
-    /**
-     * Генерация токена
-     *
-     * @param extraClaims дополнительные данные
-     * @param userDetails данные пользователя
-     * @return токен
-     */
+
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))

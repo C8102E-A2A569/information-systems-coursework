@@ -23,12 +23,17 @@ public class User implements UserDetails {
     @Column(name = "login")
     private String login;
 
-    @Column(name = "name", unique = true, nullable = false)
-    private String username;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "password", nullable = false)
     private String password;
 
+
+    @Override
+    public String getUsername(){
+        return login;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 //        TODO: Изменить, когда появятся роли

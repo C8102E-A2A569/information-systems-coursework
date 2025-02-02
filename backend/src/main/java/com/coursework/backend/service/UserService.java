@@ -21,26 +21,25 @@ public class UserService {
     }
 
     public User create(User user) {
-        if (repository.existsByUsername(user.getUsername())) {
+        if (repository.existsByLogin(user.getLogin())) {
             throw new RuntimeException("Пользователь с таким именем уже существует");
         }
-
         return save(user);
     }
 
-    public User getByUsername(String username) {
-        return repository.findByUsername(username)
+    public User getByLogin(String login) {
+        return repository.findByLogin(login)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 
     public UserDetailsService userDetailsService() {
-        return this::getByUsername;
+        return this::getByLogin;
     }
 
     public User getCurrentUser() {
         var username = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
 
-        return getByUsername(username);
+        return getByLogin(username);
     }
 }
