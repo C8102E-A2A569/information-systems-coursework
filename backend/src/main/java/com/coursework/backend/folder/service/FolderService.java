@@ -1,8 +1,8 @@
-package com.coursework.backend.service;
+package com.coursework.backend.folder.service;
 
-import com.coursework.backend.dto.FolderDto;
-import com.coursework.backend.entity.Folder;
-import com.coursework.backend.repository.FolderRepository;
+import com.coursework.backend.folder.dto.FolderDto;
+import com.coursework.backend.folder.model.Folder;
+import com.coursework.backend.folder.repository.FolderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

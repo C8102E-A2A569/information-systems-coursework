@@ -1,4 +1,4 @@
-package com.coursework.backend.dto;
+package com.coursework.backend.folder.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

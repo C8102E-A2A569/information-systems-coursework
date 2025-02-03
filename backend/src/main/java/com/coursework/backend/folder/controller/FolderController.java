@@ -1,10 +1,7 @@
-package com.coursework.backend.controller;
+package com.coursework.backend.folder.controller;
 
-import com.coursework.backend.dto.FolderDto;
-import com.coursework.backend.entity.Folder;
-import com.coursework.backend.service.FolderService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import com.coursework.backend.folder.dto.FolderDto;
+import com.coursework.backend.folder.service.FolderService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,6 +1,6 @@
-package com.coursework.backend.service;
+package com.coursework.backend.security;
 
-import com.coursework.backend.entity.User;
+import com.coursework.backend.user.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

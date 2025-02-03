@@ -1,7 +1,8 @@
-package com.coursework.backend.service;
+package com.coursework.backend.user.service;
 
-import com.coursework.backend.entity.User;
-import com.coursework.backend.repository.UserRepository;
+import com.coursework.backend.security.JwtService;
+import com.coursework.backend.user.model.User;
+import com.coursework.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;

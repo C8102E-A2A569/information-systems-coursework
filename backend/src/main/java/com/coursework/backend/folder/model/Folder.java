@@ -1,6 +1,7 @@
-package com.coursework.backend.entity;
+package com.coursework.backend.folder.model;
 
-import com.coursework.backend.dto.FolderDto;
+import com.coursework.backend.folder.dto.FolderDto;
+import com.coursework.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

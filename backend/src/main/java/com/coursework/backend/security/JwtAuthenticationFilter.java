@@ -1,7 +1,7 @@
-package com.coursework.backend.filter;
+package com.coursework.backend.security;
 
-import com.coursework.backend.service.JwtService;
-import com.coursework.backend.service.UserService;
+import com.coursework.backend.security.JwtService;
+import com.coursework.backend.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

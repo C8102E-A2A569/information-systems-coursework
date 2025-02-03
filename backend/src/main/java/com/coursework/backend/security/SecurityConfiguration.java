@@ -1,7 +1,7 @@
-package com.coursework.backend.config;
+package com.coursework.backend.security;
 
-import com.coursework.backend.filter.JwtAuthenticationFilter;
-import com.coursework.backend.service.UserService;
+import com.coursework.backend.security.JwtAuthenticationFilter;
+import com.coursework.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
