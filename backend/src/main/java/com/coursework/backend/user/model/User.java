@@ -20,7 +20,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "User")
+@Table(name = "\"User\"")
 public class User implements UserDetails {
     @Id
     @Column(name = "login")
