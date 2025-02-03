@@ -17,12 +17,76 @@ const RegistrationForm = () => {
             [name]: value
         });
     };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Здесь вы можете добавить логику для отправки данных на сервер
-        console.log('Form submitted:', formData);
+    const handleValidation = () => {
+        const {username, login, password} = formData;
+        if (login.length < 4) {
+            return 'Длина логина меньше 4';
+        }
+        if (password.length < 5) {
+            return 'Длина пароля меньше 5';
+        }
+        if (username.length < 4) {
+            return 'Длина имени меньше 4';
+        }
+        if (username.length > 30) {
+            return 'Длина имени больше 30';
+        }
+        if (login.length > 25) {
+            return 'Длина логина меньше 4';
+        }
+        if (password.length > 20) {
+            return 'Длина пароля меньше 5';
+        }
+        return null;
     };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const url = isLogin
+            ? 'http://localhost:8080/backend-1.0-SNAPSHOT/auth/sign-up'
+            : 'http://localhost:8080/backend-1.0-SNAPSHOT/auth/sign-in';
+        const validationError = handleValidation();
+        if (validationError) {
+            setErrorMessage(validationError);
+            return;
+        }
+        try {
+            const dataToSend = {
+                login: formData.username,
+                password: formData.password,
+                isWaitingAdmin: formData.isWaitingAdmin
+            };
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            });
+            console.log('Form submitted:', dataToSend);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData.error;
+                setErrorMessage(errorMessage);
+                console.log(errorMessage);
+            } else {
+                setErrorMessage('')
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.role);
+                localStorage.setItem('login', formData.username)
+                localStorage.setItem('isWaitingAdmin', data.isWaitingAdmin)
+                console.log(data.token)
+                console.log(data.role)
+                console.log(formData.username)
+                navigate('/main-page');
+            }
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
+    };
+
 
     const toggleForm = (isLogin) => {
         setIsLogin(isLogin);

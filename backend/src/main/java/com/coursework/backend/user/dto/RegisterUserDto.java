@@ -10,15 +10,15 @@ import lombok.Getter;
 public class RegisterUserDto {
 
     @NotBlank
-    @Size(min = 5, max = 15)
+    @Size(min = 4, max = 25)
     private String login;
 
     @NotBlank
-    @Size(min = 5, max = 15)
+    @Size(min = 4, max = 30)
     private String name;
 
     @NotBlank
-    @Size(min = 5, max = 15)
+    @Size(min = 5, max = 20)
     private String password;
 
 }
