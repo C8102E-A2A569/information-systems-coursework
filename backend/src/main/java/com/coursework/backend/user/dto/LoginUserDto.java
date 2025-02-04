@@ -1,7 +1,7 @@
 package com.coursework.backend.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,15 +10,10 @@ import lombok.Getter;
 public class LoginUserDto {
 
     @NotBlank
-    @Size(min = 4, max = 25)
     private String login;
 
     @NotBlank
-    @Size(min = 4, max = 30)
-    private String name;
-
-    @NotBlank
-    @Size(min = 5, max = 20)
+    @NotNull(message = "Password cannot be null")
     private String password;
 
 }

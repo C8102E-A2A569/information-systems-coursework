@@ -20,10 +20,10 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "\"User\"")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
-    @Column(name = "login")
+    @Column(name = "login",  unique = true, nullable = false)
     private String login;
 
     @Column(name = "name", nullable = false)

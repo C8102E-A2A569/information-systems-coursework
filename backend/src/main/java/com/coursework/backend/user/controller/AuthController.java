@@ -4,27 +4,26 @@ import com.coursework.backend.user.dto.AuthResponseDto;
 import com.coursework.backend.user.dto.LoginUserDto;
 import com.coursework.backend.user.dto.RegisterUserDto;
 import com.coursework.backend.user.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/auth")
+public class AuthController {
 
     private final AuthService authService;
 
     // регистрация
-    @GetMapping("/sign-up")
-    public AuthResponseDto signUp(RegisterUserDto user) {
+    @PostMapping("/sign-up")
+    public AuthResponseDto signUp(@RequestBody RegisterUserDto user) {
         return authService.register(user);
     }
 
     // вход
-    @GetMapping("/sign-in")
-    public AuthResponseDto signIn(LoginUserDto user) {
+    @PostMapping("/sign-in")
+    public AuthResponseDto signIn(@Valid @RequestBody LoginUserDto user) {
         return authService.login(user);
     }
 }

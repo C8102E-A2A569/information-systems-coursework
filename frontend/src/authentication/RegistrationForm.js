@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import './RegistrationForm.css';
+import {useNavigate} from "react-router-dom";
 
 const RegistrationForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [formData, setFormData] = useState({
-        username: '',
+        name: '',
         login: '',
         password: ''
     });
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -18,42 +21,45 @@ const RegistrationForm = () => {
         });
     };
     const handleValidation = () => {
-        const {username, login, password} = formData;
+        const {name, login, password} = formData;
         if (login.length < 4) {
             return 'Длина логина меньше 4';
         }
-        if (password.length < 5) {
-            return 'Длина пароля меньше 5';
+        if (password.length < 4) {
+            return 'Длина пароля меньше 4';
         }
-        if (username.length < 4) {
+        if (name.length < 4) {
             return 'Длина имени меньше 4';
         }
-        if (username.length > 30) {
+        if (name.length > 30) {
             return 'Длина имени больше 30';
         }
         if (login.length > 25) {
-            return 'Длина логина меньше 4';
+            return 'Длина логина больше 25';
         }
         if (password.length > 20) {
-            return 'Длина пароля меньше 5';
+            return 'Длина пароля больше 20';
         }
         return null;
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = isLogin
-            ? 'http://localhost:8080/backend-1.0-SNAPSHOT/auth/sign-up'
-            : 'http://localhost:8080/backend-1.0-SNAPSHOT/auth/sign-in';
-        const validationError = handleValidation();
-        if (validationError) {
-            setErrorMessage(validationError);
-            return;
+            ? 'http://localhost:8080/auth/sign-in'
+            : 'http://localhost:8080/auth/sign-up';
+
+        if (!isLogin) {
+            const validationError = handleValidation();
+            if (validationError) {
+                setErrorMessage(validationError);
+                return;
+            }
         }
         try {
             const dataToSend = {
-                login: formData.username,
+                login: formData.login,
                 password: formData.password,
-                isWaitingAdmin: formData.isWaitingAdmin
+                name: formData.name
             };
             const response = await fetch(url, {
                 method: 'POST',
@@ -73,12 +79,10 @@ const RegistrationForm = () => {
                 setErrorMessage('')
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
-                localStorage.setItem('role', data.role);
-                localStorage.setItem('login', formData.username)
-                localStorage.setItem('isWaitingAdmin', data.isWaitingAdmin)
+                localStorage.setItem('name', data.name);
+                localStorage.setItem('login', formData.login)
                 console.log(data.token)
-                console.log(data.role)
-                console.log(formData.username)
+                console.log(formData.name)
                 navigate('/main-page');
             }
 
@@ -160,8 +164,8 @@ const RegistrationForm = () => {
                             <input
                                 className='name'
                                 type="text"
-                                name="username"
-                                value={formData.username}
+                                name="name"
+                                value={formData.name}
                                 onChange={handleChange}
                                 required
                             />
