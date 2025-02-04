@@ -1,5 +1,6 @@
 package com.coursework.backend.user.service;
 
+import com.coursework.backend.exception.exceptions.UserAlreadyExistsException;
 import com.coursework.backend.security.JwtService;
 import com.coursework.backend.user.dto.AuthResponseDto;
 import com.coursework.backend.user.dto.LoginUserDto;
@@ -26,7 +27,7 @@ public class AuthService {
 
     public AuthResponseDto register(@Valid RegisterUserDto registerUserDto) {
         if (userRepository.existsByLogin(registerUserDto.getLogin())) {
-            throw new IllegalArgumentException("Пользователь с таким логином уже существует");
+            throw new UserAlreadyExistsException("Пользователь с таким логином уже существует");
         }
 
         User user = new User();
@@ -35,9 +36,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
 
         User savedUser = userService.save(user);
-
         String token = jwtService.generateToken(savedUser);
-
         return new AuthResponseDto(savedUser.getLogin(), savedUser.getName(), token);
     }
 
@@ -45,7 +44,7 @@ public class AuthService {
         try {
             final var user = userService.getByLogin(loginUserDto.getLogin());
             if (!passwordEncoder.matches(loginUserDto.getPassword(), user.getPassword())) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Неверный логин или пароль");
             }
             String token = jwtService.generateToken(user);
             return new AuthResponseDto(user.getLogin(), user.getName(), token);

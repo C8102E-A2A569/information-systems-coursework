@@ -18,8 +18,8 @@ public class FolderController {
     private final FolderService folderService;
 
     //получить список всех папок пользователя автоматически при входе на сайт
-    @GetMapping("/user/{userLogin}")
-    public List<FolderDto> getFoldersByUser(@PathVariable String userLogin) {
-        return folderService.getFoldersByUser(userLogin);
+    @GetMapping("/user")
+    public List<FolderDto> getFoldersByUser() {
+        return folderService.getFoldersByUser();
     }
 }

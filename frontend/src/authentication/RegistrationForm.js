@@ -19,6 +19,7 @@ const RegistrationForm = () => {
             ...formData,
             [name]: value
         });
+        setErrorMessage('');
     };
     const handleValidation = () => {
         const {name, login, password} = formData;
@@ -72,7 +73,7 @@ const RegistrationForm = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                const errorMessage = errorData.error;
+                const errorMessage = errorData.message;
                 setErrorMessage(errorMessage);
                 console.log(errorMessage);
             } else {

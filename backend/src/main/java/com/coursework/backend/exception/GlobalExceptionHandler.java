@@ -10,19 +10,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return new ErrorResponse(
-                e.getClass().getCanonicalName(),
+                "UserAlreadyExists",
                 e.getMessage()
         );
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
+//    @ExceptionHandler(UserNotFoundException.class)
+//    @ResponseStatus(HttpStatus.NOT_FOUND)
+//    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
+//        return new ErrorResponse(
+//                "UserNotFound",
+//                e.getMessage()
+//        );
+//    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidCredentialsException(IllegalArgumentException e) {
         return new ErrorResponse(
-                e.getClass().getCanonicalName(),
+                "InvalidCredentials",
                 e.getMessage()
         );
     }

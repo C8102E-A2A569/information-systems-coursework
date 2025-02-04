@@ -108,3 +108,8 @@ input {
 #form1{
     margin-top: 50px;
 }
+
+.error-message {
+    position: absolute;
+    color: red;
+}
