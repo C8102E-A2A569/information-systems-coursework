@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.*;
 @Entity
 @Builder
 @Data
@@ -24,13 +25,15 @@ public class Folder {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "user_login", referencedColumnName = "login", insertable = false, updatable = false)
+    @JoinColumn(name = "user_login", referencedColumnName = "login")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "parent_folder_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_folder_id", referencedColumnName = "id")
     private Folder parentFolder;
 
+    @OneToMany(mappedBy = "parentFolder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Folder> subFolders = new ArrayList<>();
 
     public FolderDto toDto(){
         return FolderDto.builder()

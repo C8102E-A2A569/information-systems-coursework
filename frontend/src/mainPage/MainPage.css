@@ -1,3 +1,8 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 .MainPage {
     height: 100vh;
     width: 100vw;
@@ -20,3 +25,46 @@
     box-shadow: 0 0 3px #00b9ff;
     background-color: #32bef6;
 }
+
+.folders {
+    background-color: #a42cf8;
+    width: 350px;
+    height: 550px;
+    position: fixed;
+    top: 100px;
+    left: 20px;
+    border-radius: 8px;
+    color: #f6f4ee;
+    overflow-y: auto;
+}
+
+.folders .folder {
+    background-color: #c573fb;
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin: 10px 20px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.folders .folderIcon {
+    right: 40px;
+    margin-top: 3px;
+    position: absolute;
+    color: #f6f4ee;
+}
+
+.folders::-webkit-scrollbar {
+    width: 6px;
+}
+
+.folders::-webkit-scrollbar-thumb {
+    background: #c172f8;
+    border-radius: 7px;
+}
+
+.folders::-webkit-scrollbar-thumb:hover {
+    background: #cf94f8;
+}
+
+/* background: rgba(15, 230, 172, 0.8); */

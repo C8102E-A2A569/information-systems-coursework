@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './MainPage.css';
-
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -23,11 +24,13 @@ const MainPage = () => {
                 },
             });
             if (!response.ok) {
-                //throw new Error('Ошибка при получении папок');
+                console.log("Ошибка")
+                throw new Error('Ошибка при получении папок');
             }
 
             const data = await response.json();
-            setFolders(data); // Сохраняем папки в состоянии
+            console.log('Полученные данные:', data)
+            setFolders(data);
         } catch (error) {
             console.log('Ошибка при загрузке папок');
         }
@@ -37,17 +40,17 @@ const MainPage = () => {
         fetchFolders();
     }, []);
 
-    const MainPage = () => {
-        return (
-            <div className="MainPage">
-                <button className="logout" onClick={handleLogout}>Выход</button>
-                <ul>
-                    {folders.map((folder, index) => (
-                        <li key={index}>{folder.name}</li>
-                    ))}
-                </ul>
-            </div>
-        );
-    }
+    return (
+        <div className="MainPage">
+            <button className="logout" onClick={handleLogout}>Выход</button>
+            <ul className="folders">
+                {folders.map((folder, index) => (
+                    <div className="folder" key={index}>{folder.name}
+                <FontAwesomeIcon icon={faFolderClosed} className="folderIcon"/>
+                    </div>
+            ))}
+            </ul>
+        </div>
+    );
 }
 export default MainPage;

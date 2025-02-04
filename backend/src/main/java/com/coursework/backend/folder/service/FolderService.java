@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,10 +19,13 @@ public class FolderService {
 
     private final FolderRepository folderRepository;
     private final UserService userService;
+    Logger logger = Logger.getLogger("Folder info");
 
     public List<FolderDto> getFoldersByUser() {
         final User user = userService.getCurrentUser();
-        List<Folder> folders = folderRepository.findByUserLogin(user.getLogin());
+        logger.log(Level.INFO, "User login: " + user.getLogin());
+        List<Folder> folders = folderRepository.findAllByUser(user);
+        logger.log(Level.INFO, "Folders count: " + folders.size());
         return folders.stream().map(Folder::toDto).collect(Collectors.toList());
     }
 }

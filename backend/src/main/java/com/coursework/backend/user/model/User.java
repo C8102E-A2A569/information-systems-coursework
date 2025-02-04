@@ -1,5 +1,6 @@
 package com.coursework.backend.user.model;
 
+import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.group.model.Group;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,10 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Builder
@@ -41,6 +39,8 @@ public class User implements UserDetails {
     private Set<Group> groups = new HashSet<>();
 
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Folder> folders = new ArrayList<>();
     @Override
     public String getUsername(){
         return login;
