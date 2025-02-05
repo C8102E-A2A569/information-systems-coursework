@@ -1,0 +1,30 @@
+
+// REGISTER
+curl --location 'http://localhost:8080/auth/sign-up' \
+--header 'Content-Type: application/json' \
+--data '{
+    "login": "user1",
+    "name": "username",
+    "password": "12345"
+}'
+
+// LOGIN
+curl --location 'http://localhost:8080/auth/sign-in' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "login": "user1",
+    "password": "12345"
+}'
+
+//CREATE GROUP
+curl --location 'http://localhost:8080/groups?userLogin=user1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "group1"
+}'
+//ADD USER INTO GROUP
+http://localhost:8080/groups/add-user/1/users/user2/admin/user1
+//REMOVE USER FROM GROUP
+
+//DELETE GROUP
+

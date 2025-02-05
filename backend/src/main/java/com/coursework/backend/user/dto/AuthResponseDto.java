@@ -9,12 +9,11 @@ public class AuthResponseDto {
     private String name;
     private String token;
     private final String tokenType = "Bearer ";
-    private Map<Long, String> groupsWithRoles;  // Группы с ролями
 
-    public AuthResponseDto(String login, String name, String token, Map<Long, String> groupsWithRoles) {
+    public AuthResponseDto(String login, String name, String token) {
         this.login = login;
         this.name = name;
         this.token = token;
-        this.groupsWithRoles = groupsWithRoles;
     }
 }
+

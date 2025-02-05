@@ -21,13 +21,6 @@ public class UserService {
         return repository.save(user);
     }
 
-//    public User create(User user) {
-//        if (repository.existsByLogin(user.getLogin())) {
-//            throw new RuntimeException("Пользователь с таким именем уже существует");
-//        }
-//        return save(user);
-//    }
-
     public User getByLogin(String login) {
         return repository.findByLogin(login)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с логином %s не найден"));

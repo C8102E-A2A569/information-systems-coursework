@@ -17,6 +17,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(UserAlreadyInGroupException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleUserAlreadyInGroupException(UserAlreadyInGroupException e) {
+        return new ErrorResponse(
+                "UserAlreadyInGroup",
+                e.getMessage()
+        );
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {

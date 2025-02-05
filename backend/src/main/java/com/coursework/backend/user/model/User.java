@@ -32,20 +32,11 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "have_groups",
-            joinColumns = @JoinColumn(name = "user_login"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
-    )
-    private Set<Group> groups = new HashSet<>();
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserGroupRole> roles = new HashSet<>();
+    private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Folder> folders = new ArrayList<>();
-
     @Override
     public String getUsername(){
         return login;
@@ -53,9 +44,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(userGroupRole -> new SimpleGrantedAuthority(userGroupRole.getRole().getAuthority()))
-                .collect(Collectors.toList());
+        return userGroupRoles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRole().getAuthority()))
+                .collect(Collectors.toSet());
     }
     @Override
     public boolean isAccountNonExpired() {

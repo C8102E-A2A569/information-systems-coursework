@@ -26,23 +26,7 @@ public class Group {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "groups")
-    private Set<User> users = new HashSet<>();
-
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserGroupRole> roles = new HashSet<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Group group = (Group) o;
-        return Objects.equals(id, group.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 }
 

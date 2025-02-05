@@ -43,9 +43,7 @@ public class AuthService {
         User savedUser = userService.save(user);
         String token = jwtService.generateToken(savedUser);
 
-        Map<Long, String> groupsWithRoles = getGroupsWithRoles(savedUser);
-
-        return new AuthResponseDto(savedUser.getLogin(), savedUser.getName(), token, groupsWithRoles);
+        return new AuthResponseDto(savedUser.getLogin(), savedUser.getName(), token);
     }
 
     public AuthResponseDto login(@Valid LoginUserDto loginUserDto) {
@@ -56,20 +54,11 @@ public class AuthService {
             }
             String token = jwtService.generateToken(user);
 
-            Map<Long, String> groupsWithRoles = getGroupsWithRoles(user);
-
-            return new AuthResponseDto(user.getLogin(), user.getName(), token, groupsWithRoles);
+            return new AuthResponseDto(user.getLogin(), user.getName(), token);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             throw new IllegalArgumentException("Неверный логин или пароль");
         }
     }
-
-    private Map<Long, String> getGroupsWithRoles(User user) {
-        Map<Long, String> groupsWithRoles = new HashMap<>();
-        user.getRoles().forEach(userGroupRole -> {
-            groupsWithRoles.put(userGroupRole.getGroup().getId(), userGroupRole.getRole().name());
-        });
-        return groupsWithRoles;
-    }
 }
+

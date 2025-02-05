@@ -6,7 +6,22 @@ CREATE TABLE IF NOT EXISTS "users"(
 
 CREATE TABLE IF NOT EXISTS "groups" (
     "id" SERIAL PRIMARY KEY,
-    "name" VARCHAR(50) NOT NULL
+    "name" VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS "user_group_roles" (
+    "group_id" INTEGER NOT NULL,
+    "user_login" VARCHAR(35) NOT NULL,
+    "role" VARCHAR(50) NOT NULL,
+    PRIMARY KEY ("group_id", "user_login"),
+
+    CONSTRAINT "FK_user_group_roles_group_id"
+      FOREIGN KEY ("group_id")
+          REFERENCES "groups"("id") ON DELETE CASCADE,
+
+    CONSTRAINT "FK_user_group_roles_user_login"
+      FOREIGN KEY ("user_login")
+          REFERENCES "users"("login") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "tests" (
@@ -27,18 +42,18 @@ CREATE TABLE IF NOT EXISTS "tests" (
 );
 
 CREATE TABLE IF NOT EXISTS "folders" (
-    "id" SERIAL PRIMARY KEY,
-    "name" VARCHAR(50) NOT NULL,
-    "user_login" VARCHAR(35) NOT NULL,
-    "parent_folder_id" INTEGER,
+     "id" SERIAL PRIMARY KEY,
+     "name" VARCHAR(50) NOT NULL,
+     "user_login" VARCHAR(35) NOT NULL,
+     "parent_folder_id" INTEGER,
 
-    CONSTRAINT "FK_folders_user_login"
-     FOREIGN KEY ("user_login")
-         REFERENCES "users"("login"),
+     CONSTRAINT "FK_folders_user_login"
+         FOREIGN KEY ("user_login")
+             REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_folders_parent_folder_id"
-     FOREIGN KEY ("parent_folder_id")
-         REFERENCES "folders"("id")
+     CONSTRAINT "FK_folders_parent_folder_id"
+         FOREIGN KEY ("parent_folder_id")
+             REFERENCES "folders"("id")
 );
 
 CREATE TABLE IF NOT EXISTS "questions" (
@@ -93,20 +108,20 @@ CREATE TABLE IF NOT EXISTS "access_to_tests" (
 );
 
 CREATE TABLE IF NOT EXISTS "results" (
-    "id" SERIAL PRIMARY KEY,
-    "test_id" TEXT NOT NULL,
-    "user_login" VARCHAR(35) NOT NULL,
-    "start_time" TIMESTAMP NOT NULL,
-    "end_time" TIMESTAMP,
-    "test_time" TIMESTAMP,
+     "id" SERIAL PRIMARY KEY,
+     "test_id" TEXT NOT NULL,
+     "user_login" VARCHAR(35) NOT NULL,
+     "start_time" TIMESTAMP NOT NULL,
+     "end_time" TIMESTAMP,
+     "test_time" TIMESTAMP,
 
-    CONSTRAINT "FK_results_user_login"
-     FOREIGN KEY ("user_login")
-         REFERENCES "users"("login"),
+     CONSTRAINT "FK_results_user_login"
+         FOREIGN KEY ("user_login")
+             REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_results_test_id"
-     FOREIGN KEY ("test_id")
-         REFERENCES "tests"("uuid_training")
+     CONSTRAINT "FK_results_test_id"
+         FOREIGN KEY ("test_id")
+             REFERENCES "tests"("uuid_training")
 );
 
 CREATE TABLE IF NOT EXISTS "answers" (
@@ -123,34 +138,4 @@ CREATE TABLE IF NOT EXISTS "answers" (
     CONSTRAINT "FK_answers_question_id"
      FOREIGN KEY ("question_id")
          REFERENCES "questions"("id")
-);
-
-CREATE TABLE IF NOT EXISTS "have_groups" (
-     "group_id" INTEGER NOT NULL,
-     "user_login" VARCHAR(35) NOT NULL,
-     PRIMARY KEY ("group_id", "user_login"),
-
-     CONSTRAINT "FK_have_groups_group_id"
-         FOREIGN KEY ("group_id")
-             REFERENCES "groups"("id"),
-
-     CONSTRAINT "FK_have_groups_user_login"
-         FOREIGN KEY ("user_login")
-             REFERENCES "users"("login"),
-
-     CONSTRAINT "unique_group_user" UNIQUE ("group_id", "user_login")
-);
-CREATE TABLE IF NOT EXISTS "user_group_roles" (
-    "group_id" INTEGER NOT NULL,
-    "user_login" VARCHAR(35) NOT NULL,
-    "role" VARCHAR(50) NOT NULL,
-    PRIMARY KEY ("group_id", "user_login"),
-
-    CONSTRAINT "FK_user_group_roles_group_id"
-      FOREIGN KEY ("group_id")
-          REFERENCES "groups"("id") ON DELETE CASCADE,
-
-    CONSTRAINT "FK_user_group_roles_user_login"
-      FOREIGN KEY ("user_login")
-          REFERENCES "users"("login") ON DELETE CASCADE
 );

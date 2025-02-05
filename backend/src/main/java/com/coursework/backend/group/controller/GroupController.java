@@ -11,25 +11,28 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/groups")
 @RequiredArgsConstructor
 public class GroupController {
+
     private final GroupService groupService;
 
     @PostMapping
     public GroupDto createGroup(@RequestParam String userLogin, @RequestBody @Valid CreateGroupDto dto) {
-        return groupService.createGroup(userLogin, dto);
+        return groupService.createGroup(dto, userLogin);
     }
 
-    @DeleteMapping("/delete/{groupId}/users/{userLogin}")
-    public void deleteGroup(@PathVariable Long groupId, @PathVariable String userLogin) {
-        groupService.deleteGroup(groupId, userLogin);
+    @DeleteMapping("/delete/{groupId}/users/{userLogin}/admin/{adminLogin}")
+    public void deleteGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
+        groupService.deleteGroup(groupId, adminLogin);
     }
 
-    @PostMapping("/add-user/{groupId}/users/{userLogin}")
-    public void addUserToGroup(@PathVariable Long groupId, @PathVariable String userLogin) {
-        groupService.addUserToGroup(groupId, userLogin);
+    @PostMapping("/add-user/{groupId}/users/{userLogin}/admin/{adminLogin}")
+    public void addUserToGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
+        groupService.addUserToGroup(groupId, userLogin, adminLogin);
     }
 
-    @DeleteMapping("/remove-user/{groupId}/users/{userLogin}")
-    public void removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin) {
-        groupService.removeUserFromGroup(groupId, userLogin);
+    @DeleteMapping("/remove-user/{groupId}/users/{userLogin}/admin/{adminLogin}")
+    public void removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
+        groupService.removeUserFromGroup(groupId, userLogin, adminLogin);
     }
+
 }
+
