@@ -1,6 +1,5 @@
 package com.coursework.backend.exception;
-import com.coursework.backend.exception.exceptions.UserAlreadyExistsException;
-import com.coursework.backend.exception.exceptions.UserNotFoundException;
+import com.coursework.backend.exception.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,14 +17,14 @@ public class GlobalExceptionHandler {
         );
     }
 
-//    @ExceptionHandler(UserNotFoundException.class)
-//    @ResponseStatus(HttpStatus.NOT_FOUND)
-//    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
-//        return new ErrorResponse(
-//                "UserNotFound",
-//                e.getMessage()
-//        );
-//    }
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
+        return new ErrorResponse(
+                "UserNotFound",
+                e.getMessage()
+        );
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -35,4 +34,41 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
     }
+
+    @ExceptionHandler(GroupNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleGroupNotFoundException(GroupNotFoundException e) {
+        return new ErrorResponse(
+                "GroupNotFound",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UserNotInGroupException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUserNotInGroupException(UserNotInGroupException e) {
+        return new ErrorResponse(
+                "UserNotInGroup",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UserGroupRoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserGroupRoleNotFoundException(UserGroupRoleNotFoundException e) {
+        return new ErrorResponse(
+                "UserGroupRoleNotFound",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+        return new ErrorResponse(
+                e.getClass().getCanonicalName(),
+                e.getMessage()
+        );
+    }
+
 }

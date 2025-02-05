@@ -15,6 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -27,7 +30,9 @@ public class AuthService {
 
     public AuthResponseDto register(@Valid RegisterUserDto registerUserDto) {
         if (userRepository.existsByLogin(registerUserDto.getLogin())) {
-            throw new UserAlreadyExistsException("Пользователь с таким логином уже существует");
+            throw new UserAlreadyExistsException(
+                    String.format("Пользователь с логином %s уже существует", registerUserDto.getLogin())
+            );
         }
 
         User user = new User();
@@ -37,7 +42,10 @@ public class AuthService {
 
         User savedUser = userService.save(user);
         String token = jwtService.generateToken(savedUser);
-        return new AuthResponseDto(savedUser.getLogin(), savedUser.getName(), token);
+
+        Map<Long, String> groupsWithRoles = getGroupsWithRoles(savedUser);
+
+        return new AuthResponseDto(savedUser.getLogin(), savedUser.getName(), token, groupsWithRoles);
     }
 
     public AuthResponseDto login(@Valid LoginUserDto loginUserDto) {
@@ -47,10 +55,21 @@ public class AuthService {
                 throw new IllegalArgumentException("Неверный логин или пароль");
             }
             String token = jwtService.generateToken(user);
-            return new AuthResponseDto(user.getLogin(), user.getName(), token);
+
+            Map<Long, String> groupsWithRoles = getGroupsWithRoles(user);
+
+            return new AuthResponseDto(user.getLogin(), user.getName(), token, groupsWithRoles);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             throw new IllegalArgumentException("Неверный логин или пароль");
         }
+    }
+
+    private Map<Long, String> getGroupsWithRoles(User user) {
+        Map<Long, String> groupsWithRoles = new HashMap<>();
+        user.getRoles().forEach(userGroupRole -> {
+            groupsWithRoles.put(userGroupRole.getGroup().getId(), userGroupRole.getRole().name());
+        });
+        return groupsWithRoles;
     }
 }

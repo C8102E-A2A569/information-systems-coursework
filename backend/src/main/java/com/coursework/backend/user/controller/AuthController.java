@@ -17,13 +17,13 @@ public class AuthController {
 
     // регистрация
     @PostMapping("/sign-up")
-    public AuthResponseDto signUp(@RequestBody RegisterUserDto user) {
+    public AuthResponseDto signUp(@RequestBody @Valid  RegisterUserDto user) {
         return authService.register(user);
     }
 
     // вход
     @PostMapping("/sign-in")
-    public AuthResponseDto signIn(@Valid @RequestBody LoginUserDto user) {
+    public AuthResponseDto signIn(@RequestBody @Valid  LoginUserDto user) {
         return authService.login(user);
     }
 }

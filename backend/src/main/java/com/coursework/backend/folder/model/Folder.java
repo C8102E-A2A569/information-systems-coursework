@@ -14,7 +14,7 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Folder")
+@Table(name = "folders")
 public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

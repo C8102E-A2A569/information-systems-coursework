@@ -1,15 +1,17 @@
 package com.coursework.backend.group.dto;
 
 import com.coursework.backend.userGroupRole.model.Role;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Set;
-
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class GroupDto {
-    private Long id;
+@Setter
+public class CreateGroupDto {
+    @NotBlank
     private String name;
-    private Set<String> users;
 }

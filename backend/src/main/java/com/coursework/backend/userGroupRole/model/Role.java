@@ -1,4 +1,4 @@
-package com.coursework.backend.group.model;
+package com.coursework.backend.userGroupRole.model;
 
 import org.springframework.security.core.GrantedAuthority;
 public enum Role implements GrantedAuthority {

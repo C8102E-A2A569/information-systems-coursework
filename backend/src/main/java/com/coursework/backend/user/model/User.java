@@ -2,6 +2,7 @@ package com.coursework.backend.user.model;
 
 import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.group.model.Group;
+import com.coursework.backend.userGroupRole.model.UserGroupRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Builder
@@ -32,25 +34,29 @@ public class User implements UserDetails {
 
     @ManyToMany
     @JoinTable(
-            name = "Have_group",
+            name = "have_groups",
             joinColumns = @JoinColumn(name = "user_login"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     private Set<Group> groups = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserGroupRole> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Folder> folders = new ArrayList<>();
+
     @Override
     public String getUsername(){
         return login;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        TODO: Изменить, когда появятся роли
-        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return roles.stream()
+                .map(userGroupRole -> new SimpleGrantedAuthority(userGroupRole.getRole().getAuthority()))
+                .collect(Collectors.toList());
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -69,5 +75,18 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(login, user.login);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login);
     }
 }

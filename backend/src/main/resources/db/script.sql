@@ -1,15 +1,15 @@
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE IF NOT EXISTS "users"(
     "login" VARCHAR(35) PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "password" VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Groups (
+CREATE TABLE IF NOT EXISTS "groups" (
     "id" SERIAL PRIMARY KEY,
-    "role" VARCHAR(50) NOT NULL
+    "name" VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Test (
+CREATE TABLE IF NOT EXISTS "tests" (
     "uuid_training" TEXT PRIMARY KEY,
     "name" TEXT NOT NULL,
     "creator_login" VARCHAR(35) NOT NULL,
@@ -17,84 +17,82 @@ CREATE TABLE IF NOT EXISTS Test (
     "points" INTEGER,
     "group_id" INTEGER,
 
-    CONSTRAINT "FK_Test.creator_login"
-      FOREIGN KEY ("creator_login")
-          REFERENCES users("login"),
+    CONSTRAINT "FK_tests_creator_login"
+       FOREIGN KEY ("creator_login")
+           REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_Test.group_id"
-      FOREIGN KEY ("group_id")
-          REFERENCES Groups("id")
+    CONSTRAINT "FK_tests_group_id"
+       FOREIGN KEY ("group_id")
+           REFERENCES "groups"("id")
 );
 
-CREATE TABLE IF NOT EXISTS Folder (
+CREATE TABLE IF NOT EXISTS "folders" (
     "id" SERIAL PRIMARY KEY,
     "name" VARCHAR(50) NOT NULL,
     "user_login" VARCHAR(35) NOT NULL,
     "parent_folder_id" INTEGER,
 
-    CONSTRAINT "FK_Folder.user_login"
-        FOREIGN KEY ("user_login")
-            REFERENCES users("login"),
+    CONSTRAINT "FK_folders_user_login"
+     FOREIGN KEY ("user_login")
+         REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_Folder.parent_folder_id"
-        FOREIGN KEY ("parent_folder_id")
-            REFERENCES Folder("id")
+    CONSTRAINT "FK_folders_parent_folder_id"
+     FOREIGN KEY ("parent_folder_id")
+         REFERENCES "folders"("id")
 );
 
-CREATE TABLE IF NOT EXISTS Questions (
+CREATE TABLE IF NOT EXISTS "questions" (
     "id" SERIAL PRIMARY KEY,
     "test_id" TEXT NOT NULL,
     "question" TEXT NOT NULL,
     "points" INTEGER,
     "type" TEXT NOT NULL,
 
-    CONSTRAINT "FK_Questions.test_id"
+    CONSTRAINT "FK_questions_test_id"
        FOREIGN KEY ("test_id")
-           REFERENCES Test("uuid_training")
+           REFERENCES "tests"("uuid_training")
 );
 
-CREATE TABLE IF NOT EXISTS FolderTest (
+CREATE TABLE IF NOT EXISTS "folder_tests" (
     "test_id" TEXT NOT NULL,
     "folder_id" INTEGER NOT NULL,
     PRIMARY KEY ("test_id", "folder_id"),
 
-    CONSTRAINT "FK_FolderTest.test_id"
-        FOREIGN KEY ("test_id")
-            REFERENCES Test("uuid_training"),
+    CONSTRAINT "FK_folder_tests_test_id"
+      FOREIGN KEY ("test_id")
+          REFERENCES "tests"("uuid_training"),
 
-    CONSTRAINT "FK_FolderTest.folder_id"
-        FOREIGN KEY ("folder_id")
-            REFERENCES Folder("id")
+    CONSTRAINT "FK_folder_tests_folder_id"
+      FOREIGN KEY ("folder_id")
+          REFERENCES "folders"("id")
 );
 
-CREATE TABLE IF NOT EXISTS Answer_options (
+CREATE TABLE IF NOT EXISTS "answer_options" (
     "id" SERIAL PRIMARY KEY,
     "question_id" INTEGER NOT NULL,
     "option" TEXT NOT NULL,
     "correct" BOOLEAN,
 
-    CONSTRAINT "FK_Answer_options.question_id"
+    CONSTRAINT "FK_answer_options_question_id"
         FOREIGN KEY ("question_id")
-            REFERENCES "Questions"("id")
+            REFERENCES "questions"("id")
 );
 
-
-CREATE TABLE IF NOT EXISTS AccessToTests (
+CREATE TABLE IF NOT EXISTS "access_to_tests" (
     "test_id" TEXT NOT NULL,
     "user_login" VARCHAR(35) NOT NULL,
-
     PRIMARY KEY ("test_id", "user_login"),
 
-    CONSTRAINT "FK_AccessToTests.user_login"
-       FOREIGN KEY ("user_login")
-           REFERENCES users("login"),
+    CONSTRAINT "FK_access_to_tests_user_login"
+     FOREIGN KEY ("user_login")
+         REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_AccessToTests.test_id"
-       FOREIGN KEY ("test_id")
-           REFERENCES Test("uuid_training")
+    CONSTRAINT "FK_access_to_tests_test_id"
+     FOREIGN KEY ("test_id")
+         REFERENCES "tests"("uuid_training")
 );
 
-CREATE TABLE IF NOT EXISTS Results (
+CREATE TABLE IF NOT EXISTS "results" (
     "id" SERIAL PRIMARY KEY,
     "test_id" TEXT NOT NULL,
     "user_login" VARCHAR(35) NOT NULL,
@@ -102,43 +100,57 @@ CREATE TABLE IF NOT EXISTS Results (
     "end_time" TIMESTAMP,
     "test_time" TIMESTAMP,
 
-    CONSTRAINT "FK_Results.user_login"
+    CONSTRAINT "FK_results_user_login"
      FOREIGN KEY ("user_login")
-         REFERENCES users("login"),
+         REFERENCES "users"("login"),
 
-    CONSTRAINT "FK_Results.test_id"
+    CONSTRAINT "FK_results_test_id"
      FOREIGN KEY ("test_id")
-         REFERENCES Test("uuid_training")
+         REFERENCES "tests"("uuid_training")
 );
 
-CREATE TABLE IF NOT EXISTS Answers (
-     "id" SERIAL PRIMARY KEY,
-     "question_id" INTEGER NOT NULL,
-     "test_results_id" INTEGER NOT NULL,
-     "user_answer" TEXT,
-     "points" INTEGER,
+CREATE TABLE IF NOT EXISTS "answers" (
+    "id" SERIAL PRIMARY KEY,
+    "question_id" INTEGER NOT NULL,
+    "test_results_id" INTEGER NOT NULL,
+    "user_answer" TEXT,
+    "points" INTEGER,
 
-     CONSTRAINT "FK_Answers.test_results_id"
-         FOREIGN KEY ("test_results_id")
-             REFERENCES Results("id"),
+    CONSTRAINT "FK_answers_test_results_id"
+     FOREIGN KEY ("test_results_id")
+         REFERENCES "results"("id"),
 
-     CONSTRAINT "FK_Answers.question_id"
-         FOREIGN KEY ("question_id")
-             REFERENCES Questions("id")
+    CONSTRAINT "FK_answers_question_id"
+     FOREIGN KEY ("question_id")
+         REFERENCES "questions"("id")
 );
 
-CREATE TABLE IF NOT EXISTS Have_group (
+CREATE TABLE IF NOT EXISTS "have_groups" (
+     "group_id" INTEGER NOT NULL,
+     "user_login" VARCHAR(35) NOT NULL,
+     PRIMARY KEY ("group_id", "user_login"),
+
+     CONSTRAINT "FK_have_groups_group_id"
+         FOREIGN KEY ("group_id")
+             REFERENCES "groups"("id"),
+
+     CONSTRAINT "FK_have_groups_user_login"
+         FOREIGN KEY ("user_login")
+             REFERENCES "users"("login"),
+
+     CONSTRAINT "unique_group_user" UNIQUE ("group_id", "user_login")
+);
+CREATE TABLE IF NOT EXISTS "user_group_roles" (
     "group_id" INTEGER NOT NULL,
     "user_login" VARCHAR(35) NOT NULL,
-
+    "role" VARCHAR(50) NOT NULL,
     PRIMARY KEY ("group_id", "user_login"),
 
-    CONSTRAINT "FK_Have_group.group_id"
-        FOREIGN KEY ("group_id")
-            REFERENCES Groups("id"),
+    CONSTRAINT "FK_user_group_roles_group_id"
+      FOREIGN KEY ("group_id")
+          REFERENCES "groups"("id") ON DELETE CASCADE,
 
-    CONSTRAINT "FK_Have_group.user_login"
-        FOREIGN KEY ("user_login")
-            REFERENCES users("login")
+    CONSTRAINT "FK_user_group_roles_user_login"
+      FOREIGN KEY ("user_login")
+          REFERENCES "users"("login") ON DELETE CASCADE
 );
-

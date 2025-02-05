@@ -1,12 +1,12 @@
 package com.coursework.backend.user.service;
 
+import com.coursework.backend.exception.exceptions.UserNotFoundException;
 import com.coursework.backend.security.JwtService;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,16 +21,16 @@ public class UserService {
         return repository.save(user);
     }
 
-    public User create(User user) {
-        if (repository.existsByLogin(user.getLogin())) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
-        }
-        return save(user);
-    }
+//    public User create(User user) {
+//        if (repository.existsByLogin(user.getLogin())) {
+//            throw new RuntimeException("Пользователь с таким именем уже существует");
+//        }
+//        return save(user);
+//    }
 
     public User getByLogin(String login) {
         return repository.findByLogin(login)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с логином %s не найден"));
     }
 
     public UserDetailsService userDetailsService() {
