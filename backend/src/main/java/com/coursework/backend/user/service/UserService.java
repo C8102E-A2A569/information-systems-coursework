@@ -23,7 +23,7 @@ public class UserService {
 
     public User getByLogin(String login) {
         return repository.findByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с логином %s не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     }
 
     public UserDetailsService userDetailsService() {

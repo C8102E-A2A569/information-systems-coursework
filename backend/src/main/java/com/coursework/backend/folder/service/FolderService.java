@@ -21,11 +21,9 @@ public class FolderService {
     private final UserService userService;
     Logger logger = Logger.getLogger("Folder info");
 
-    public List<FolderDto> getFoldersByUser() {
+    public List<FolderDto> getRootFoldersByUser() {
         final User user = userService.getCurrentUser();
-        logger.log(Level.INFO, "User login: " + user.getLogin());
-        List<Folder> folders = folderRepository.findAllByUser(user);
-        logger.log(Level.INFO, "Folders count: " + folders.size());
+        List<Folder> folders = folderRepository.findAllByUserAndParentFolder(user, null);
         return folders.stream().map(Folder::toDto).collect(Collectors.toList());
     }
 }

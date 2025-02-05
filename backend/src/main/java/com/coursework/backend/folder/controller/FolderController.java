@@ -17,9 +17,9 @@ public class FolderController {
 
     private final FolderService folderService;
 
-    //получить список всех папок пользователя автоматически при входе на сайт
+    //получить список всех корневых папок пользователя автоматически при входе на сайт
     @GetMapping("/user")
-    public List<FolderDto> getFoldersByUser() {
-        return folderService.getFoldersByUser();
+    public List<FolderDto> getRootFoldersByUser() {
+        return folderService.getRootFoldersByUser();
     }
 }

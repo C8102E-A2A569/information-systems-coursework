@@ -9,4 +9,6 @@ import java.util.List;
 public interface FolderRepository extends JpaRepository<Folder, Long> {
     List<Folder> findAllByUser(User user);
 
+    List<Folder> findAllByUserAndParentFolder(User user, Folder folder);
+
 }
