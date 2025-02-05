@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS "tests" (
     "uuid_monitoring" TEXT,
     "points" INTEGER,
     "group_id" INTEGER,
+    "folder_id" INTEGER,
 
     CONSTRAINT "FK_tests_creator_login"
        FOREIGN KEY ("creator_login")

@@ -18,12 +18,13 @@
     top: 20px;
     left: 20px;
     position: fixed;
-    font-size: 16px;
+    font-size: 18px;
     color: #18085a;
+    font-family: "Calibri", sans-serif;
 }
 .logout:hover {
-    box-shadow: 0 0 3px #00b9ff;
-    background-color: #32bef6;
+    box-shadow: 0 0 4px #00b9ff;
+    background-color: #3cc7fd;
 }
 
 .folders {
@@ -36,6 +37,11 @@
     border-radius: 8px;
     color: #f6f4ee;
     overflow-y: auto;
+}
+
+.folders:hover {
+    box-shadow: 0 0 8px #b246fb;
+    background-color: #a422ff;
 }
 
 .folders .folder {
@@ -67,4 +73,73 @@
     background: #cf94f8;
 }
 
+.tests {
+    width: 500px;
+    height: 550px;
+    position: fixed;
+    top: 100px;
+    left: 550px;
+    border-radius: 8px;
+    background-color: #5dfac3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.tests:hover {
+    box-shadow: 0 0 8px #00ffb9;
+    background-color: #72f8d3;
+}
+
+.test {
+    width: 80%;
+    background-color: #ff61c9;
+    border-radius: 8px;
+    height: 110px;
+    text-align: center;
+    color: #110031;
+    border: 1px solid black;
+    font-size: 20px;
+    font-family:  "Comic Sans MS", fantasy;
+    margin: 10px;
+    box-shadow: 0 2px 3px black;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.test:hover {
+    box-shadow: 0 3px 4px black;
+}
+.start {
+    border: 1px solid black;
+    box-shadow: 0 1px 2px black;
+    border-radius: 7px;
+    width: 75px;
+    height: 28px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #3b49ff;
+    color: #fcffce;
+    font-size: 15px;
+    font-family: "Candara", sans-serif;
+}
+.start:hover{
+    box-shadow: 0 2px 3px black;
+}
+
+.tests::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tests::-webkit-scrollbar-thumb {
+    background: #0051ff;
+    border-radius: 7px;
+}
+
+.tests::-webkit-scrollbar-thumb:hover {
+    background: #4580fd;
+}
 /* background: rgba(15, 230, 172, 0.8); */
