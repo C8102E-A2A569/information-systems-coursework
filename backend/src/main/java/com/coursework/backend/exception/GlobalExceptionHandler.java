@@ -79,5 +79,12 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
     }
-
+    @ExceptionHandler(FolderNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse folderNotFoundException(FolderNotFoundException e) {
+        return new ErrorResponse(
+                "UserGroupRoleNotFound",
+                e.getMessage()
+        );
+    }
 }

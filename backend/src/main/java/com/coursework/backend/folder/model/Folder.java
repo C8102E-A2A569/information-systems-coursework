@@ -1,6 +1,7 @@
 package com.coursework.backend.folder.model;
 
 import com.coursework.backend.folder.dto.FolderDto;
+import com.coursework.backend.folder.dto.FolderDtoRequest;
 import com.coursework.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,14 @@ public class Folder {
                 .name(this.name)
                 .parentFolderId(this.parentFolder != null ? this.parentFolder.id : null)
                 .userLogin(this.user.getLogin())
+                .build();
+    }
+    public Folder dtoRequestToFolder(FolderDtoRequest request) {
+        if (request == null || request.getId() == null) {
+            throw new IllegalArgumentException("Id папки не указан");
+        }
+        return Folder.builder()
+                .id(request.getId())
                 .build();
     }
 }

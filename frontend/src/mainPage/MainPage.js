@@ -21,14 +21,14 @@ const MainPage = () => {
                 console.error('Токен не найден');
                 return;
             }
-            const response = await fetch('http://localhost:8080/folders/user', {
+            const response = await fetch('http://localhost:8080/folders/root', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
             });
             if (!response.ok) {
-                console.log("Ошибка")
                 throw new Error('Ошибка при получении папок');
             }
 
@@ -51,10 +51,10 @@ const MainPage = () => {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
             });
             if (!response.ok) {
-                console.log("Ошибка")
                 throw new Error('Ошибка при получении тестов');
             }
 
@@ -66,50 +66,106 @@ const MainPage = () => {
         }
     };
 
+
+    const fetchSubfolders = async (folderId) => {
+        const subFoldersResponse = await fetch('http://localhost:8080/folders/subfolders', {
+        method: 'POST',
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+        },
+            body: JSON.stringify({ id: folderId }),
+    });
+    if (!subFoldersResponse.ok) {
+        throw new Error('Ошибка при получении дочерних папок');
+    }
+    const subFoldersData = await subFoldersResponse.json();
+    // setSubFolders(subFoldersData);
+        return subFoldersData;
+}
+const fetchTestsFromFolder = async (folderId) => {
+    const folderTestsResponse = await fetch('http://localhost:8080/tests/tests', {
+        method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: folderId }),
+    });
+    if (!folderTestsResponse.ok) {
+        throw new Error('Ошибка при получении тестов папки');
+    }
+    const folderTestsData = await folderTestsResponse.json();
+    setFolderTests(folderTestsData);
+    }
+
+
     const handleFolderClick = async (folderId) => {
+        console.log(folderId);
         try {
             setCurrentPath(prevPath => [...prevPath, folderId]);
 
-            const subFoldersData = await fetchFolders(folderId);
+            const subFoldersData = await fetchSubfolders(folderId);
+            console.log(subFoldersData)
             setFolders(subFoldersData);
 
-            const folderTestsData = await fetchTests(folderId);
-            setFolderTests(folderTestsData);
+           // const folderTestsData = await fetchTestsFromFolder(folderId);
+        //    setFolderTests(folderTestsData);
         } catch (error) {
             console.error('Ошибка при загрузке данных для папки:', error.message);
         }
     };
 
-    const handleBack = () => {
+    const handleBack = async () => {
         if (currentPath.length === 0) return;
-
         const newPath = [...currentPath];
         newPath.pop();
         setCurrentPath(newPath);
-
-        if (newPath.length === 0) {
-            fetchFolders().then(setFolders);
-            fetchTests().then(setTests);
-            setFolderTests([]);
-        } else {
-            const parentFolderId = newPath[newPath.length - 1];
-            fetchFolders(parentFolderId).then(setFolders);
-            fetchTests(parentFolderId).then(setFolderTests);
+        if (currentPath.length === 1) {
+            await fetchFolders();
+            await fetchTests();
+            return;
         }
+        const subFoldersData = await fetchSubfolders(newPath[newPath.length - 1]);
+        setFolders(subFoldersData);
+
+        // const folderTestsData = await fetchTestsFromFolder(folderId);
+        //    setFolderTests(folderTestsData);
+
     };
 
     useEffect(() => {
-        fetchFolders();
-        fetchTests();
-    }, []);
+        const loadFolderData = async () => {
+            try {
+                if (currentPath.length === 0) {
+                    await fetchFolders();
+                    await fetchTests();
+                    setFolderTests([]);
+                } else {
+                    const parentFolderId = currentPath[currentPath.length - 1];
+                    await fetchSubfolders(parentFolderId);
+                 //   await fetchTestsFromFolder(parentFolderId);
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error.message);
+            }
+        };
+
+        loadFolderData();
+    }, [currentPath]);
 
     return (
         <div className="MainPage">
             <button className="logout" onClick={handleLogout}>Выход</button>
 
+            {currentPath.length > 0 && (
+                <button className="back" onClick={handleBack}>
+                    Назад
+                </button>
+            )}
             <ul className="folders">
-                {(selectedFolder ? subFolders : folders).length > 0 ? (
-                    (selectedFolder ? subFolders : folders).map((folder, index) => (
+                {folders && folders.length > 0 ? (
+                    folders.map((folder, index) => (
                         <div
                             className="folder"
                             key={index}
@@ -120,9 +176,10 @@ const MainPage = () => {
                         </div>
                     ))
                 ) : (
-                    <p>Нет папок</p> // Отображаем сообщение, если папок нет
+                    <p></p>
                 )}
             </ul>
+
             {currentPath.length > 0 && (
                 <div className="tests">
                     {folderTests && folderTests.length > 0 ? (
@@ -134,14 +191,14 @@ const MainPage = () => {
                             </div>
                         ))
                     ) : (
-                        <p>В папке нет тестов</p>
+                        <p></p>
                     )}
                 </div>
             )}
 
-            {currentPath.length === 0 && tests.length > 0 && (
+            {currentPath.length === 0 && tests.length >= 0 && (
                     <div className="tests">
-                        {tests && tests.length > 0 ? ( // Проверяем, что tests существует и не пуст
+                        {tests && tests.length > 0 ? (
                             tests.map((test, index) => (
                                 <div className="test" key={index}>
                                     {test.name} ({test.points} баллов)
@@ -150,7 +207,7 @@ const MainPage = () => {
                                 </div>
                             ))
                         ) : (
-                            <p>У вас пока нет тестов</p> // Отображаем сообщение, если тестов нет
+                            <p></p>
                         )}
                     </div>
                 )}

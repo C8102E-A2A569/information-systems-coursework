@@ -5,10 +5,12 @@ import com.coursework.backend.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
     List<Folder> findAllByUser(User user);
 
     List<Folder> findAllByUserAndParentFolder(User user, Folder folder);
+    Optional<Folder> findByIdAndUserLogin(Long id, String userLogin);
 
 }
