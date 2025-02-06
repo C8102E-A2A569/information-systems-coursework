@@ -6,6 +6,7 @@ import com.coursework.backend.group.dto.GroupDto;
 import com.coursework.backend.group.dto.PatchGroupDto;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.group.repository.GroupRepository;
+import com.coursework.backend.user.dto.GroupUserDto;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.repository.UserRepository;
 import com.coursework.backend.userGroupRole.dto.UserGroupRoleDto;
@@ -33,6 +34,19 @@ public class GroupService {
     private final UserRepository userRepository;
     private final UserGroupRoleRepository userGroupRoleRepository;
 
+    public Set<GroupUserDto> getUsersInGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+
+        return group.getUserGroupRoles().stream()
+                .map(userGroupRole -> new GroupUserDto(
+                        userGroupRole.getUser().getLogin(),
+                        userGroupRole.getUser().getName()
+                ))
+                .collect(Collectors.toSet());
+    }
+
+    @Transactional
     public GroupDto createGroup(CreateGroupDto createGroupDto, String userLogin) {
         // Создаем новую группу
         Group group = new Group();
@@ -54,7 +68,7 @@ public class GroupService {
 
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
-
+    @Transactional
     public GroupDto addUserToGroup(Long groupId, String userLogin, String adminLogin) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
@@ -82,7 +96,7 @@ public class GroupService {
 
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
-
+    @Transactional
     public GroupDto removeUserFromGroup(Long groupId, String userLogin, String adminLogin) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
@@ -105,7 +119,7 @@ public class GroupService {
     }
 
 
-
+    @Transactional
     public void deleteGroup(Long groupId, String adminLogin) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));

@@ -28,3 +28,6 @@ http://localhost:8080/groups/add-user/1/users/user2/admin/user1
 
 //DELETE GROUP
 
+//GET ALL USERS FROM GROUP
+curl -X GET "http://localhost:8080/groups/1/users" -H "Content-Type: application/json"
+
