@@ -46,7 +46,7 @@ public class SecurityConfiguration {
 // TODO: Изменить доступ
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/user/**", "/admin/**", "/route/**", "/route/add/file", "/func/**", "/log/**", "/person/**", "/movie/**", "/file/**").authenticated()
+                        .requestMatchers("/user/**", "/admin/**", "/route/**", "/folders/**", "/tests/**", "/log/**", "/person/**", "/movie/**", "/file/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
