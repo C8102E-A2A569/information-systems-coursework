@@ -1,0 +1,83 @@
+.profile{
+    color: #cccccc;
+    position: absolute;
+    right: 30px;
+    margin-top: 20px;
+    font-size: 40px;
+}
+
+.modal2 {
+    display: flex;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content2 {
+    background-color: #5e7aff;
+    padding: 15px;
+    border-radius: 5px;
+    width: 350px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-content2 .close {
+    cursor: pointer;
+    font-size: 36px;
+    float: right;
+    margin-top: -20px;
+
+}
+.modal-content2 h2{
+    margin-top: 20px;
+    font-size: 24px;
+    color: #10042f;
+}
+.modal-content2 input {
+    background-color: #59ffe1;
+    color: #110031;
+}
+
+.modal-content2 form{
+    margin-top: 15px;
+}
+
+.modal-content2 label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 8px;
+    color: #110031;
+    font-size: 16px;
+    text-align: left;
+    margin-left: 25px;
+}
+.modal-content2 .sendButton {
+    background-color: #110031;
+    color: white;
+    font-size: 14px;
+    border: 1px solid black;
+    padding: 8px 13px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+.modal-content2 .sendButton:hover {
+    background-color: #170043;
+    box-shadow: 0 0 3px #110031;
+}
+
+.modal-content2 .error {
+    margin-top: 20px;
+    color: #892525;
+    text-align: left;
+    margin-left: 20px;
+}

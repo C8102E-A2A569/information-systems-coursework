@@ -44,7 +44,7 @@
     border-bottom: 2px solid aliceblue;
 }
 
-button[type="submit"]{
+#form1 button[type="submit"]{
     background-color: #5df4ca;
     width: 140px;
     height: 37px;
@@ -60,7 +60,7 @@ button[type="submit"]{
     transition: background-color 0.2s ease, box-shadow 0.2s ease, border 0.2s ease, color 0.2s ease, font-size 0.2s ease;
 }
 
-button[type="submit"]:hover{
+#form1 button[type="submit"]:hover{
     background-color: #69f8d0;
     box-shadow: 0 0 7px #11B4F5;
     border: none;

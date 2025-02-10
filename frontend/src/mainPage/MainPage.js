@@ -3,6 +3,7 @@ import './MainPage.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import UserProfile from "../mainPageComponents/UserProfile";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -217,6 +218,7 @@ const fetchTestsFromFolder = async (folderId) => {
         <div className="MainPage" onClick={handleOutsideClick}>
             <button className="logout" onClick={handleLogout}>Выход</button>
 
+            <UserProfile></UserProfile>
             <ul className="folders">
                 <div className="header">
                 {currentPath.length > 0 && (

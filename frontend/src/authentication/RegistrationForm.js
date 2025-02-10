@@ -81,7 +81,8 @@ const RegistrationForm = () => {
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('name', data.name);
-                localStorage.setItem('login', formData.login)
+                localStorage.setItem('login', formData.login);
+                localStorage.setItem('password', formData.password)
                 console.log(data.token)
                 console.log(formData.name)
                 navigate('/main-page');
