@@ -36,7 +36,7 @@ public class FolderService {
 
         final User user = userService.getCurrentUser();
 
-        Folder parentFolder = folderRepository.findByIdAndUserLogin(request.getId(), user.getLogin())
+        Folder parentFolder = folderRepository.findByIdAndUser(request.getId(), user)
                 .orElseThrow(() -> new FolderNotFoundException("Папка с указанным ID не найдена"));
 
         List<Folder> subFolders = folderRepository.findAllByUserAndParentFolder(user, parentFolder);

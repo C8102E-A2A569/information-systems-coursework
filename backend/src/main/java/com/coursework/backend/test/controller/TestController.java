@@ -3,12 +3,11 @@ package com.coursework.backend.test.controller;
 import com.coursework.backend.folder.dto.FolderDto;
 import com.coursework.backend.folder.service.FolderService;
 import com.coursework.backend.test.dto.TestDto;
+import com.coursework.backend.test.dto.TestRequest;
 import com.coursework.backend.test.model.Test;
 import com.coursework.backend.test.service.TestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,5 +22,10 @@ public class TestController {
     @GetMapping("/user")
     public List<TestDto> getTestsByUser() {
         return testService.getTestsByUser();
+    }
+
+    @PostMapping("/folder")
+    public List<TestDto> getTestsByUserAndFolder(@RequestBody TestRequest testRequest) {
+        return testService.getTestsByUserAndFolder(testRequest.getFolderId());
     }
 }

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import './MainPage.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -79,25 +80,33 @@ const MainPage = () => {
     if (!subFoldersResponse.ok) {
         throw new Error('Ошибка при получении дочерних папок');
     }
-    const subFoldersData = await subFoldersResponse.json();
-    // setSubFolders(subFoldersData);
-        return subFoldersData;
+        // setSubFolders(subFoldersData);
+        return await subFoldersResponse.json();
 }
 const fetchTestsFromFolder = async (folderId) => {
-    const folderTestsResponse = await fetch('http://localhost:8080/tests/tests', {
-        method: 'POST',
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Токен не найден');
+            return [];
+        }
+        const folderTestsResponse = await fetch('http://localhost:8080/tests/folder', {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: folderId }),
-    });
-    if (!folderTestsResponse.ok) {
-        throw new Error('Ошибка при получении тестов папки');
+            },
+            body: JSON.stringify({folderId: folderId}),
+        });
+        if (!folderTestsResponse.ok) {
+            throw new Error('Ошибка при получении тестов папки');
+        }
+        return await folderTestsResponse.json();
+        //setFolderTests(folderTestsData);
+    } catch (error){
+        return [];
     }
-    const folderTestsData = await folderTestsResponse.json();
-    setFolderTests(folderTestsData);
-    }
+}
 
 
     const handleFolderClick = async (folderId) => {
@@ -109,29 +118,32 @@ const fetchTestsFromFolder = async (folderId) => {
             console.log(subFoldersData)
             setFolders(subFoldersData);
 
-           // const folderTestsData = await fetchTestsFromFolder(folderId);
-        //    setFolderTests(folderTestsData);
+            const folderTestsData = await fetchTestsFromFolder(folderId);
+            console.log(folderTestsData);
+            setFolderTests(folderTestsData);
         } catch (error) {
             console.error('Ошибка при загрузке данных для папки:', error.message);
         }
     };
 
-    const handleBack = async () => {
+    const handleBack = async (folderId) => {
         if (currentPath.length === 0) return;
         const newPath = [...currentPath];
         newPath.pop();
         setCurrentPath(newPath);
-        if (currentPath.length === 1) {
+        if (newPath.length === 0) {
             await fetchFolders();
             await fetchTests();
-            return;
+            setFolderTests([]);
+        } else {
+            const parentFolderId = newPath[newPath.length - 1];
+
+            const subFoldersData = await fetchSubfolders(parentFolderId);
+            setFolders(subFoldersData);
+
+            const folderTestsData = await fetchTestsFromFolder(parentFolderId);
+            setFolderTests(folderTestsData);
         }
-        const subFoldersData = await fetchSubfolders(newPath[newPath.length - 1]);
-        setFolders(subFoldersData);
-
-        // const folderTestsData = await fetchTestsFromFolder(folderId);
-        //    setFolderTests(folderTestsData);
-
     };
 
     useEffect(() => {
@@ -158,12 +170,13 @@ const fetchTestsFromFolder = async (folderId) => {
         <div className="MainPage">
             <button className="logout" onClick={handleLogout}>Выход</button>
 
-            {currentPath.length > 0 && (
-                <button className="back" onClick={handleBack}>
-                    Назад
-                </button>
-            )}
             <ul className="folders">
+
+                {currentPath.length > 0 && (
+                    <KeyboardBackspaceIcon className="back" onClick={() => handleBack(currentPath[currentPath.length - 1])} style={{ fontSize: '32px' }}>
+                    </KeyboardBackspaceIcon>
+                )}
+
                 {folders && folders.length > 0 ? (
                     folders.map((folder, index) => (
                         <div

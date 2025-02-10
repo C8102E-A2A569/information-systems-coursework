@@ -142,4 +142,10 @@
 .tests::-webkit-scrollbar-thumb:hover {
     background: #4580fd;
 }
+
+.back {
+    color: #eed7fd;
+    margin-top: 10px;
+    margin-left: 10px;
+}
 /* background: rgba(15, 230, 172, 0.8); */
