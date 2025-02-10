@@ -2,14 +2,15 @@ package com.coursework.backend.folder.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CreateFolderRequest {
+@AllArgsConstructor
+@Getter
+@Setter
+public class PatchFolderDto {
     @NotBlank
     private String name;
-    private Long parentFolderId;
 }

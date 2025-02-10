@@ -25,6 +25,14 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
     }
+    @ExceptionHandler(InvalidFolderNameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidFolderNameException(InvalidFolderNameException e) {
+        return new ErrorResponse(
+                "InvalidFolderName",
+                e.getMessage()
+        );
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -84,6 +92,24 @@ public class GlobalExceptionHandler {
     public ErrorResponse folderNotFoundException(FolderNotFoundException e) {
         return new ErrorResponse(
                 "UserGroupRoleNotFound",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(FolderCreationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleFolderCreationException(FolderCreationException e) {
+        return new ErrorResponse(
+                "FolderCreation",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(FolderUpdateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleFolderUpdateException(FolderUpdateException e) {
+        return new ErrorResponse(
+                "FolderUpdate",
                 e.getMessage()
         );
     }
