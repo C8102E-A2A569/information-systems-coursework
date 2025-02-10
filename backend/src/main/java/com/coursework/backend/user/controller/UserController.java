@@ -1,12 +1,12 @@
 package com.coursework.backend.user.controller;
 
+import com.coursework.backend.user.dto.PatchUserDto;
+import com.coursework.backend.user.dto.UserDto;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -18,4 +18,10 @@ public class UserController {
     public User getUserLogin(@PathVariable String login) {
         return userService.getByLogin(login);
     }
+
+    @PatchMapping("/{currentLogin}")
+    public UserDto patchUser(@PathVariable String currentLogin, @Valid @RequestBody PatchUserDto patchUserDto) {
+        return userService.updateUser(currentLogin, patchUserDto);
+    }
+
 }

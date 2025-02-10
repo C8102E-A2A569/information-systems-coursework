@@ -1,6 +1,7 @@
 package com.coursework.backend.group.model;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,7 @@ public class Group {
     private String name;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 }
 

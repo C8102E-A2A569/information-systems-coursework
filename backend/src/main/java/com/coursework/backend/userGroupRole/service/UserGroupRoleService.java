@@ -19,8 +19,6 @@ public class UserGroupRoleService {
     private final UserGroupRoleRepository userGroupRoleRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-
-
     public void save(UserGroupRole userGroupRole) {
         userGroupRoleRepository.save(userGroupRole);
     }

@@ -2,6 +2,7 @@ package com.coursework.backend.group.controller;
 
 import com.coursework.backend.group.dto.CreateGroupDto;
 import com.coursework.backend.group.dto.GroupDto;
+import com.coursework.backend.group.dto.PatchGroupDto;
 import com.coursework.backend.group.service.GroupService;
 import com.coursework.backend.user.dto.GroupUserDto;
 import jakarta.validation.Valid;
@@ -27,6 +28,13 @@ public class GroupController {
         return groupService.createGroup(dto, userLogin);
     }
 
+    @PatchMapping("/{groupId}/update-name")
+    public GroupDto updateGroupName(@PathVariable Long groupId,
+                                    @RequestParam String adminLogin,
+                                    @RequestBody @Valid PatchGroupDto patchGroupDto) {
+        return groupService.updateGroupName(groupId, patchGroupDto, adminLogin);
+    }
+
     @DeleteMapping("/delete/{groupId}/users/{userLogin}/admin/{adminLogin}")
     public void deleteGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
         groupService.deleteGroup(groupId, adminLogin);
@@ -41,6 +49,5 @@ public class GroupController {
     public void removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
         groupService.removeUserFromGroup(groupId, userLogin, adminLogin);
     }
-
 }
 

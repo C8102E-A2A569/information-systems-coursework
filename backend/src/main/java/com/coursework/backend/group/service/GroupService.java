@@ -68,6 +68,22 @@ public class GroupService {
 
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
+
+    @Transactional
+    public GroupDto updateGroupName(Long groupId, PatchGroupDto patchGroupDto, String adminLogin) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+
+        if (!isAdmin(group, adminLogin)) {
+            throw new AccessDeniedException("Недостаточно прав для изменения названия группы");
+        }
+
+        group.setName(patchGroupDto.getName());
+        groupRepository.save(group);
+
+        return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
+    }
+
     @Transactional
     public GroupDto addUserToGroup(Long groupId, String userLogin, String adminLogin) {
         Group group = groupRepository.findById(groupId)
@@ -117,7 +133,6 @@ public class GroupService {
 
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
-
 
     @Transactional
     public void deleteGroup(Long groupId, String adminLogin) {

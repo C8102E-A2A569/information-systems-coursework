@@ -24,10 +24,19 @@ curl --location 'http://localhost:8080/groups?userLogin=user1' \
 }'
 //ADD USER INTO GROUP
 http://localhost:8080/groups/add-user/1/users/user2/admin/user1
-//REMOVE USER FROM GROUP
 
-//DELETE GROUP
+// UPDATE GROUP NAME
+http://localhost:8080/groups/2/update-name?adminLogin=user1
 
 //GET ALL USERS FROM GROUP
 curl -X GET "http://localhost:8080/groups/1/users" -H "Content-Type: application/json"
+
+
+// UPDATE USER
+curl --location --request PATCH 'http://localhost:8080/user/user1' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkxOTk5MjYsImV4cCI6MTczOTM0MzkyNn0.l9K_h0j5NFkQZiHmL5FF4Ga9pjq84fONn8juSQRP6qY' \
+--data '{
+    "name": "AlinaRom"
+}'
 

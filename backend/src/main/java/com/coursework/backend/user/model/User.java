@@ -3,6 +3,7 @@ package com.coursework.backend.user.model;
 import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
