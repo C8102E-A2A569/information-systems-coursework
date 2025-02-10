@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import './MainPage.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -10,6 +11,9 @@ const MainPage = () => {
     const [selectedFolder, setSelectedFolder] = useState(null);
     const [subFolders, setSubFolders] = useState([]);
     const [folderTests, setFolderTests] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newFolder, setNewFolder] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const handleLogout = () => {
         window.localStorage.removeItem('token');
         window.location = '/registration-form'
@@ -79,25 +83,33 @@ const MainPage = () => {
     if (!subFoldersResponse.ok) {
         throw new Error('Ошибка при получении дочерних папок');
     }
-    const subFoldersData = await subFoldersResponse.json();
-    // setSubFolders(subFoldersData);
-        return subFoldersData;
+        // setSubFolders(subFoldersData);
+        return await subFoldersResponse.json();
 }
 const fetchTestsFromFolder = async (folderId) => {
-    const folderTestsResponse = await fetch('http://localhost:8080/tests/tests', {
-        method: 'POST',
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Токен не найден');
+            return [];
+        }
+        const folderTestsResponse = await fetch('http://localhost:8080/tests/folder', {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: folderId }),
-    });
-    if (!folderTestsResponse.ok) {
-        throw new Error('Ошибка при получении тестов папки');
+            },
+            body: JSON.stringify({folderId: folderId}),
+        });
+        if (!folderTestsResponse.ok) {
+            throw new Error('Ошибка при получении тестов папки');
+        }
+        return await folderTestsResponse.json();
+        //setFolderTests(folderTestsData);
+    } catch (error){
+        return [];
     }
-    const folderTestsData = await folderTestsResponse.json();
-    setFolderTests(folderTestsData);
-    }
+}
 
 
     const handleFolderClick = async (folderId) => {
@@ -109,29 +121,76 @@ const fetchTestsFromFolder = async (folderId) => {
             console.log(subFoldersData)
             setFolders(subFoldersData);
 
-           // const folderTestsData = await fetchTestsFromFolder(folderId);
-        //    setFolderTests(folderTestsData);
+            const folderTestsData = await fetchTestsFromFolder(folderId);
+            console.log(folderTestsData);
+            setFolderTests(folderTestsData);
         } catch (error) {
             console.error('Ошибка при загрузке данных для папки:', error.message);
         }
     };
 
-    const handleBack = async () => {
+    const handleBack = async (folderId) => {
         if (currentPath.length === 0) return;
         const newPath = [...currentPath];
         newPath.pop();
         setCurrentPath(newPath);
-        if (currentPath.length === 1) {
+        if (newPath.length === 0) {
             await fetchFolders();
             await fetchTests();
+            setFolderTests([]);
+        } else {
+            const parentFolderId = newPath[newPath.length - 1];
+
+            const subFoldersData = await fetchSubfolders(parentFolderId);
+            setFolders(subFoldersData);
+
+            const folderTestsData = await fetchTestsFromFolder(parentFolderId);
+            setFolderTests(folderTestsData);
+        }
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+        setErrorMessage('');
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setNewFolder('');
+    };
+
+    const handleCreateFolder = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Токен не найден');
             return;
         }
-        const subFoldersData = await fetchSubfolders(newPath[newPath.length - 1]);
-        setFolders(subFoldersData);
+        const currentFolderId = currentPath[currentPath.length - 1];
+        const response = await fetch('http://localhost:8080/folders/create', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: newFolder,
+                parentFolderId: currentFolderId || null,
+            }),
+        });
 
-        // const folderTestsData = await fetchTestsFromFolder(folderId);
-        //    setFolderTests(folderTestsData);
+        if (!response.ok) {
+            const errorData = await response.json();
+            setErrorMessage( 'Произошла ошибка при создании папки');
+        } else {
+            const newFolder = await response.json();
+            setFolders(prevFolders => [newFolder, ...prevFolders]);
+            closeModal();
+        }
+    };
 
+    const handleOutsideClick = (e) => {
+        if (e.target.className !== 'modal') return;
+        closeModal();
     };
 
     useEffect(() => {
@@ -144,7 +203,7 @@ const fetchTestsFromFolder = async (folderId) => {
                 } else {
                     const parentFolderId = currentPath[currentPath.length - 1];
                     await fetchSubfolders(parentFolderId);
-                 //   await fetchTestsFromFolder(parentFolderId);
+                    await fetchTestsFromFolder(parentFolderId);
                 }
             } catch (error) {
                 console.error('Ошибка при загрузке данных:', error.message);
@@ -155,15 +214,20 @@ const fetchTestsFromFolder = async (folderId) => {
     }, [currentPath]);
 
     return (
-        <div className="MainPage">
+        <div className="MainPage" onClick={handleOutsideClick}>
             <button className="logout" onClick={handleLogout}>Выход</button>
 
-            {currentPath.length > 0 && (
-                <button className="back" onClick={handleBack}>
-                    Назад
-                </button>
-            )}
             <ul className="folders">
+                <div className="header">
+                {currentPath.length > 0 && (
+                    <KeyboardBackspaceIcon className="back"
+                                           onClick={() => handleBack(currentPath[currentPath.length - 1])}
+                                           style={{ fontSize: '32px' }}>
+                    </KeyboardBackspaceIcon>
+                )}
+                    <div className="placeholder"></div>
+                    <div className="addFolder" onClick={openModal}>+</div>
+                </div>
                 {folders && folders.length > 0 ? (
                     folders.map((folder, index) => (
                         <div
@@ -211,6 +275,27 @@ const fetchTestsFromFolder = async (folderId) => {
                         )}
                     </div>
                 )}
+            {isModalOpen && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h3>Новая папка</h3>
+                        {errorMessage && <p style={{ color: '#7f0000' }}>{errorMessage}</p>}
+                        <input
+                            type="text"
+                            value={newFolder}
+                            onChange={(e) => {
+                                setNewFolder(e.target.value);
+                                setErrorMessage('');
+                            }}
+                            placeholder="Введите название папки"
+                        />
+                        <div className="modal-actions">
+                            <button onClick={handleCreateFolder}>Создать</button>
+                            <button onClick={closeModal}>Отмена</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )};
     export default MainPage;

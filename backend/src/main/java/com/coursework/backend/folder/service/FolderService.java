@@ -1,6 +1,7 @@
 package com.coursework.backend.folder.service;
 
 import com.coursework.backend.exception.exceptions.FolderNotFoundException;
+import com.coursework.backend.folder.dto.CreateFolderRequest;
 import com.coursework.backend.folder.dto.FolderDto;
 import com.coursework.backend.folder.dto.FolderDtoRequest;
 import com.coursework.backend.folder.model.Folder;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -36,10 +36,35 @@ public class FolderService {
 
         final User user = userService.getCurrentUser();
 
-        Folder parentFolder = folderRepository.findByIdAndUserLogin(request.getId(), user.getLogin())
+        Folder parentFolder = folderRepository.findByIdAndUser(request.getId(), user)
                 .orElseThrow(() -> new FolderNotFoundException("Папка с указанным ID не найдена"));
 
         List<Folder> subFolders = folderRepository.findAllByUserAndParentFolder(user, parentFolder);
         return subFolders.stream().map(Folder::toDto).collect(Collectors.toList());
+    }
+
+    public FolderDto createFolder(CreateFolderRequest request) {
+        try {
+            final User user = userService.getCurrentUser();
+            if (request.getName() == null || request.getName().isEmpty()) {
+                throw new IllegalArgumentException("Название папки не указано");
+            }
+            Folder parentFolder = request.getParentFolderId() != null
+                    ? folderRepository.findByIdAndUser(request.getParentFolderId(), user)
+                    .orElseThrow(() -> new RuntimeException("Родительская папка не найдена"))
+                    : null;
+
+            Folder newFolder = Folder.builder()
+                    .parentFolder(parentFolder)
+                    .user(user)
+                    .name(request.getName())
+                    .build();
+
+            folderRepository.save(newFolder);
+            return newFolder.toDto();
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Не удалось создать папку");
+        }
     }
 }

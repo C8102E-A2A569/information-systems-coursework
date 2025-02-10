@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface TestRepository extends JpaRepository<Test, String> {
     boolean existsById(String id);
+
     List<Test> findAllByCreatorAndFolder(User user, Folder folder);
+
     boolean existsByUuidMonitoring(String uuidMonitoring);
 
     default boolean existsByField(String fieldName, String value) {

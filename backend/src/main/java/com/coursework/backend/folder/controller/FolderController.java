@@ -1,7 +1,9 @@
 package com.coursework.backend.folder.controller;
 
+import com.coursework.backend.folder.dto.CreateFolderRequest;
 import com.coursework.backend.folder.dto.FolderDto;
 import com.coursework.backend.folder.dto.FolderDtoRequest;
+import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.folder.service.FolderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,5 +26,10 @@ public class FolderController {
     @PostMapping("/subfolders")
     public List<FolderDto> geSubfolders(@RequestBody FolderDtoRequest request) {
         return folderService.getSubfolders(request);
+    }
+
+    @PostMapping("/create")
+    public FolderDto createFolder(@RequestBody CreateFolderRequest request) {
+        return folderService.createFolder(request);
     }
 }
