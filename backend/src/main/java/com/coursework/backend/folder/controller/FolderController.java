@@ -24,12 +24,12 @@ public class FolderController {
         return folderService.getRootFoldersByUser();
     }
 
-    @PostMapping("/subfolders")
-    public List<FolderDto> geSubfolders(@RequestBody FolderDtoRequest request) {
-        return folderService.getSubfolders(request);
+    @PostMapping("/subFolders")
+    public List<FolderDto> geSubFolders(@RequestBody FolderDtoRequest request) {
+        return folderService.getSubFolders(request);
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public FolderDto createFolder(@RequestBody CreateFolderRequest request) {
         return folderService.createFolder(request);
     }
