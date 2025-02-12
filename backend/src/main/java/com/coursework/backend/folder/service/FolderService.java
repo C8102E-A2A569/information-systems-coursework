@@ -1,9 +1,11 @@
 package com.coursework.backend.folder.service;
 
 import com.coursework.backend.exception.exceptions.FolderNotFoundException;
+import com.coursework.backend.exception.exceptions.FolderUpdateException;
 import com.coursework.backend.folder.dto.CreateFolderRequest;
 import com.coursework.backend.folder.dto.FolderDto;
 import com.coursework.backend.folder.dto.FolderDtoRequest;
+import com.coursework.backend.folder.dto.PatchFolderDto;
 import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.folder.repository.FolderRepository;
 import com.coursework.backend.user.model.User;
@@ -67,4 +69,18 @@ public class FolderService {
             throw new IllegalArgumentException("Не удалось создать папку");
         }
     }
+
+    public FolderDto patchFolder(Long folderId, PatchFolderDto patchFolderDto) {
+        if (patchFolderDto.getName() == null || patchFolderDto.getName().isEmpty()) {
+            throw new FolderUpdateException("Новое название папки не указано");
+        }
+
+        User user = userService.getCurrentUser();
+        Folder folder = folderRepository.findByIdAndUser(folderId, user)
+                .orElseThrow(() -> new FolderNotFoundException("Папка с указанным ID не найдена"));
+
+        folder.setName(patchFolderDto.getName());
+        return folderRepository.save(folder).toDto();
+    }
+
 }

@@ -1,0 +1,16 @@
+.groups{
+    position: fixed;
+    background-color: #5ee8ff;
+    width: 350px;
+    height: 550px;
+    right: 50px;
+    top:100px;overflow-y: auto;
+    border-radius: 8px;
+    border: 2px solid black;
+}
+
+.groups h2{
+    text-align: center;
+    margin-top: 15px;
+    color: #110031;
+}

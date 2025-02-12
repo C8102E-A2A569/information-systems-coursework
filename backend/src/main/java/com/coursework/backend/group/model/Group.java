@@ -31,4 +31,3 @@ public class Group {
     @JsonIgnore
     private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 }
-

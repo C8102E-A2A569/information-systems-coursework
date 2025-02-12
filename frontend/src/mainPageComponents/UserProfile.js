@@ -41,7 +41,7 @@ const UserProfile = () => {
 
 
         // if (response.ok) {
-        //     localStorage.setItem('username', username);
+        //     localStorage.setItem('login', username);
         //     localStorage.setItem('password', password);
         //     localStorage.setItem('name', name);
         //     closeModal(); // Закрываем модальное окно после отправки

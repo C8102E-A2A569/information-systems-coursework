@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import './MainPage.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import UserProfile from "../mainPageComponents/UserProfile";
+import Groups from "../mainPageComponents/Groups";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -15,6 +17,8 @@ const MainPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newFolder, setNewFolder] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [searchId, setSearchId] = useState('');
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const handleLogout = () => {
         window.localStorage.removeItem('token');
         window.location = '/registration-form'
@@ -160,6 +164,23 @@ const fetchTestsFromFolder = async (folderId) => {
         setNewFolder('');
     };
 
+    const openSearchModal = () => {
+        setIsSearchModalOpen(true);
+        setSearchId('');
+    };
+
+    const closeSearchModal = () => {
+        setIsSearchModalOpen(false);
+        setSearchId('');
+    };
+
+    const handleSearch = () => {
+        // Здесь будет логика для поиска по ID
+        console.log('Идет поиск теста с ID:', searchId);
+        // Реализация поиска...
+        closeSearchModal(); // Закрываем модальное окно после поиска
+    };
+
     const handleCreateFolder = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -192,6 +213,7 @@ const fetchTestsFromFolder = async (folderId) => {
     const handleOutsideClick = (e) => {
         if (e.target.className !== 'modal') return;
         closeModal();
+        closeSearchModal();
     };
 
     useEffect(() => {
@@ -217,7 +239,9 @@ const fetchTestsFromFolder = async (folderId) => {
     return (
         <div className="MainPage" onClick={handleOutsideClick}>
             <button className="logout" onClick={handleLogout}>Выход</button>
-
+            <button className="search" onClick={openSearchModal}>
+                <FontAwesomeIcon icon={faSearch} className="icon"/> Найти тест
+            </button>
             <UserProfile></UserProfile>
             <ul className="folders">
                 <div className="header">
@@ -277,6 +301,9 @@ const fetchTestsFromFolder = async (folderId) => {
                         )}
                     </div>
                 )}
+
+            <Groups></Groups>
+
             {isModalOpen && (
                 <div className="modal">
                     <div className="modal-content">
@@ -295,6 +322,19 @@ const fetchTestsFromFolder = async (folderId) => {
                             <button onClick={handleCreateFolder}>Создать</button>
                             <button onClick={closeModal}>Отмена</button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {isSearchModalOpen && (
+                <div className="modal">
+                    <div className="search-modal">
+                        <input
+                            type="text"
+                            value={searchId}
+                            onChange={(e) => setSearchId(e.target.value)}
+                            placeholder="Введите id"
+                        />
+                        <button className="search-button" onClick={handleSearch}>Найти</button>
                     </div>
                 </div>
             )}

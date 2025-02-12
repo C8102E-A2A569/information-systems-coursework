@@ -1,4 +1,3 @@
-
 // REGISTER
 curl --location 'http://localhost:8080/auth/sign-up' \
 --header 'Content-Type: application/json' \
@@ -32,6 +31,7 @@ http://localhost:8080/groups/2/update-name?adminLogin=user1
 curl -X GET "http://localhost:8080/groups/1/users" -H "Content-Type: application/json"
 
 
+
 // UPDATE USER
 curl --location --request PATCH 'http://localhost:8080/user/user1' \
 --header 'Content-Type: application/json' \
@@ -39,4 +39,35 @@ curl --location --request PATCH 'http://localhost:8080/user/user1' \
 --data '{
     "name": "AlinaRom"
 }'
+
+
+
+// CREATE FOLDER
+curl --location 'http://localhost:8080/folders' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw' \
+--data '{
+           "name": "Math"
+         }'
+
+// UPDATE FOLDER NAME
+curl --location --request PATCH 'http://localhost:8080/folders/1' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw' \
+--data '{
+           "name": "Mathematics"
+         }'
+
+// GET SUBFOLDERS
+curl --location 'http://localhost:8080/folders/subFolders' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw' \
+--data '{
+           "id": 1
+         }'
+
+// GET ROOT FOLDERS
+curl --location 'http://localhost:8080/folders/root' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw'
+
 
