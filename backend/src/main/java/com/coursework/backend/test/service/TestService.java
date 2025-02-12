@@ -2,6 +2,7 @@ package com.coursework.backend.test.service;
 
 
 import com.coursework.backend.exception.exceptions.AccessDeniedException;
+import com.coursework.backend.exception.exceptions.FolderNotFoundException;
 import com.coursework.backend.exception.exceptions.GroupNotFoundException;
 import com.coursework.backend.exception.exceptions.TestNotFoundException;
 import com.coursework.backend.folder.dto.FolderDto;
@@ -66,14 +67,14 @@ public class TestService {
         Folder folder = null;
         if (createTestDto.getFolderId() != null) {
             folder = folderRepository.findByIdAndUser(createTestDto.getFolderId(), currentUser)
-                    .orElseThrow(() -> new RuntimeException("Папка не найдена"));
+                    .orElseThrow(() -> new FolderNotFoundException("Папка не найдена"));
         }
 
         // Get group if specified
         Group group = null;
         if (createTestDto.getGroupId() != null) {
             group = groupRepository.findById(createTestDto.getGroupId())
-                    .orElseThrow(() -> new RuntimeException("Группа не найдена"));
+                    .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
         }
 
         Test test = new Test(createTestDto.getName(), currentUser, group, folder);
@@ -88,15 +89,15 @@ public class TestService {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findById(assignTestToGroupDto.getTestId())
-                .orElseThrow(() -> new RuntimeException("Тест не найден"));
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
 
         // Verify test ownership
         if (!test.getCreator().equals(currentUser)) {
-            throw new RuntimeException("Нет прав для изменения теста");
+            throw new AccessDeniedException("Нет прав для изменения теста");
         }
 
         Group group = groupRepository.findById(assignTestToGroupDto.getGroupId())
-                .orElseThrow(() -> new RuntimeException("Группа не найдена"));
+                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
         test.setGroup(group);
         Test savedTest = testRepository.save(test);
