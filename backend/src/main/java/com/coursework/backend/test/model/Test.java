@@ -54,7 +54,6 @@ public class Test {
         this.folder = folder;
     }
 
-
     @PrePersist
     protected void onCreate() {
         if (id == null || id.isEmpty()) {

@@ -11,6 +11,7 @@ public interface TestRepository extends JpaRepository<Test, String> {
     boolean existsById(String id);
 
     List<Test> findAllByCreatorAndFolder(User user, Folder folder);
+    List<Test> findByIdOrNameOrUuidMonitoring(String id, String name, String uuidMonitoring);
 
     boolean existsByUuidMonitoring(String uuidMonitoring);
 

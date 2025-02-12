@@ -43,11 +43,12 @@ curl --location --request PATCH 'http://localhost:8080/user/user1' \
 
 
 // CREATE FOLDER
-curl --location 'http://localhost:8080/folders' \
+curl --location 'http://localhost:8080/folders/create' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k' \
 --data '{
-           "name": "Math"
+           "name": "Math_Tests",
+           "parentFolderId": 1
          }'
 
 // UPDATE FOLDER NAME
@@ -71,3 +72,26 @@ curl --location 'http://localhost:8080/folders/root' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkyMTY4ODQsImV4cCI6MTczOTM2MDg4NH0.CfsYlLtL-ynUoTuzSL89pc4TssEPVpsbSI8M7NLMYqw'
 
 
+
+//CREATE TEST
+curl --location 'http://localhost:8080/tests/create' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k' \
+--data '{
+    "name": "Math_Test1",
+    "folderId": 4,
+    "groupId": 2
+}'
+
+//SEARCH TEST
+curl --location 'http://localhost:8080/tests/search?query=Math_Test1' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k'
+
+//ASSIGN TEST TO GROUP
+curl --location 'http://localhost:8080/tests/assign-group' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k' \
+--data '{
+    "testId": "ff005d95",
+    "groupId": 2
+}'
