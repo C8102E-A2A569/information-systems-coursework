@@ -95,9 +95,14 @@ CREATE TABLE IF NOT EXISTS "answer_options" (
 );
 
 CREATE TABLE IF NOT EXISTS "access_to_tests" (
+    "id" SERIAL PRIMARY KEY,
+    "folder_id" INTEGER,
     "test_id" TEXT NOT NULL,
     "user_login" VARCHAR(35) NOT NULL,
-    PRIMARY KEY ("test_id", "user_login"),
+
+    CONSTRAINT "FK_access_to_tests_folder_id"
+        FOREIGN KEY ("folder_id")
+            REFERENCES "folders"("id"),
 
     CONSTRAINT "FK_access_to_tests_user_login"
      FOREIGN KEY ("user_login")

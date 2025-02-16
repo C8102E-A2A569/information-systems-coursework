@@ -6,6 +6,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import UserProfile from "../mainPageComponents/UserProfile";
 import Groups from "../mainPageComponents/Groups";
+import {useNavigate} from "react-router-dom";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -19,6 +20,8 @@ const MainPage = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [searchId, setSearchId] = useState('');
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+    const navigate = useNavigate();
     const handleLogout = () => {
         window.localStorage.removeItem('token');
         window.location = '/registration-form'
@@ -215,6 +218,29 @@ const fetchTestsFromFolder = async (folderId) => {
         closeModal();
         closeSearchModal();
     };
+    const handleStartTest = async (testId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Токен не найден');
+                return;
+            }
+            const response = await fetch(`http://localhost:8080/tests/start`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Ошибка при получении вопросов');
+            }
+            const questionsData = await response.json();
+            navigate('/test-page', { state: { questions: questionsData } });
+        } catch (error) {
+            console.error('Ошибка при загрузке данных теста:', error);
+        }
+    };
 
     useEffect(() => {
         const loadFolderData = async () => {
@@ -277,7 +303,7 @@ const fetchTestsFromFolder = async (folderId) => {
                             <div className="test" key={index}>
                                 {test.name} ({test.points} баллов)
                                 <br/>
-                                <button className="start">Пройти</button>
+                                <button className="start"  onClick={() => handleStartTest(test.id)}>Пройти</button>
                             </div>
                         ))
                     ) : (
@@ -293,7 +319,7 @@ const fetchTestsFromFolder = async (folderId) => {
                                 <div className="test" key={index}>
                                     {test.name} ({test.points} баллов)
                                     <br/>
-                                    <button className="start">Пройти</button>
+                                    <button className="start" onClick={() => handleStartTest(test.id)}>Пройти</button>
                                 </div>
                             ))
                         ) : (

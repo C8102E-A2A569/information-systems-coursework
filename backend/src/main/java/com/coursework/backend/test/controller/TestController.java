@@ -30,7 +30,7 @@ public class TestController {
     //получить список всех тестов пользователя в корневой папке автоматически при входе на сайт
     @GetMapping("/user")
     public List<TestDto> getTestsByUser() {
-        return testService.getTestsByUser();
+        return testService.getRootTestsByUser();
     }
 
     @PostMapping("/folder")
