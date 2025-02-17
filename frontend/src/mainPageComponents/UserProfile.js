@@ -33,19 +33,41 @@ const UserProfile = () => {
     };
 
     // Функция для обработки отправки формы
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Предотвращаем перезагрузку страницы
-        console.log({ username, password, name });
-        //отправка данных
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Token not found');
+            return;
+        }
 
+        try {
+            const response = await fetch(`http://localhost:8080/user/${username}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    login: username,
+                    name: name,
+                    password: password,
+                }),
+            });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Невозможно обновить данные');
+            }
 
-        // if (response.ok) {
-        //     localStorage.setItem('login', username);
-        //     localStorage.setItem('password', password);
-        //     localStorage.setItem('name', name);
-        //     closeModal(); // Закрываем модальное окно после отправки
-        // }
+            const updatedUser = await response.json();
+            localStorage.setItem('login', updatedUser.login);
+            localStorage.setItem('name', updatedUser.name);
+            localStorage.setItem('password', password);
+            closeModal();
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
     };
 
     const handleOutsideClick = (e) => {
