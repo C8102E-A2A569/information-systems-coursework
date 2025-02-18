@@ -18,14 +18,15 @@ import com.coursework.backend.test.repository.AccessToTestsRepository;
 import com.coursework.backend.test.repository.TestRepository;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
+import com.coursework.backend.userGroupRole.model.Role;
+import com.coursework.backend.userGroupRole.model.UserGroupRole;
+import com.coursework.backend.userGroupRole.repository.UserGroupRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class TestService {
     private final TestRepository testRepository;
     private final UserService userService;
+    private final UserGroupRoleRepository userGroupRoleRepository;
     private final FolderRepository folderRepository;
     private final GroupRepository groupRepository;
     private final AccessToTestsRepository accessToTestsRepository;
@@ -56,47 +58,63 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional
     public TestDto createTest(CreateTestDto createTestDto) {
         final User currentUser = userService.getCurrentUser();
 
-        // Get folder if specified
         Folder folder = null;
         if (createTestDto.getFolderId() != null) {
             folder = folderRepository.findByIdAndUser(createTestDto.getFolderId(), currentUser)
                     .orElseThrow(() -> new FolderNotFoundException("Папка не найдена"));
         }
 
-        // Get group if specified
         Group group = null;
         if (createTestDto.getGroupId() != null) {
             group = groupRepository.findById(createTestDto.getGroupId())
                     .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+
+            if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+                throw new AccessDeniedException("Только администратор группы может добавлять тесты");
+            }
         }
-
         Test test = new Test(createTestDto.getName(), currentUser, group, folder);
-        String uniqueId = generateUniqueIdForField("uuid_training");
-        test.setId(uniqueId);
 
+        String trainingId = generateUniqueIdForField("uuid_training");
+        test.setId(trainingId);
+
+        if (createTestDto.isMonitoringMode()) {
+            String monitoringId = generateUniqueIdForField("uuid_monitoring");
+            test.setUuidMonitoring(monitoringId);
+        }
         Test savedTest = testRepository.save(test);
-        //не проверено
+
         AccessToTests accessToTest = new AccessToTests();
         accessToTest.setFolder(folder);
         accessToTest.setUser(currentUser);
-        accessToTest.setTest(test);
+        accessToTest.setTest(savedTest);
         accessToTestsRepository.save(accessToTest);
+
+        if (group != null) {
+            for (UserGroupRole userGroupRole : group.getUserGroupRoles()) {
+                if (!userGroupRole.getUser().equals(currentUser)) {
+                    AccessToTests memberAccess = new AccessToTests();
+                    memberAccess.setUser(userGroupRole.getUser());
+                    memberAccess.setTest(savedTest);
+                    memberAccess.setFolder(null);
+                    accessToTestsRepository.save(memberAccess);
+                }
+            }
+        }
 
         return savedTest.toDto();
     }
-
-    // тут тоже надо дописать, что тест появляется у пользователей в какой-то папке в таблице access_to_tests
+    @Transactional
     public TestDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
         final User currentUser = userService.getCurrentUser();
 
-        Test test = testRepository.findById(assignTestToGroupDto.getTestId())
+        Test test = testRepository.findByIdOrName(assignTestToGroupDto.getTestId(), assignTestToGroupDto.getTestId())
                 .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
 
-        // Verify test ownership
         if (!test.getCreator().equals(currentUser)) {
             throw new AccessDeniedException("Нет прав для изменения теста");
         }
@@ -104,14 +122,134 @@ public class TestService {
         Group group = groupRepository.findById(assignTestToGroupDto.getGroupId())
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
+        if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+            throw new AccessDeniedException("Только администратор группы может добавлять тесты");
+        }
+
         test.setGroup(group);
         Test savedTest = testRepository.save(test);
+
+        for (UserGroupRole userGroupRole : group.getUserGroupRoles()) {
+            if (!userGroupRole.getUser().equals(currentUser)) {
+                if (!accessToTestsRepository.existsByUserAndTest(userGroupRole.getUser(), savedTest)) {
+                    AccessToTests memberAccess = new AccessToTests();
+                    memberAccess.setUser(userGroupRole.getUser());
+                    memberAccess.setTest(savedTest);
+                    memberAccess.setFolder(null);
+                    accessToTestsRepository.save(memberAccess);
+                }
+            }
+        }
+
         return savedTest.toDto();
     }
+    @Transactional
+    public TestDto addTestToFolder(String testId, Long folderId) {
+        final User currentUser = userService.getCurrentUser();
+
+        Test test = testRepository.findByIdOrName(testId, testId)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+
+        Folder folder = folderRepository.findByIdAndUser(folderId, currentUser)
+                .orElseThrow(() -> new FolderNotFoundException("Папка не найдена"));
+
+        boolean isMonitoringMode = test.getUuidMonitoring() != null;
+        boolean isCreator = test.getCreator().equals(currentUser);
+        boolean isGroupedTest = test.getGroup() != null;
+
+        if (isGroupedTest && isMonitoringMode && !test.getCreator().equals(currentUser)) {
+            throw new AccessDeniedException("Нельзя добавлять групповой тест в свою папку в режиме прохождения");
+        }
+
+        AccessToTests userAccess = accessToTestsRepository.findByUserAndTest(currentUser, test)
+                .orElseGet(() -> {
+                    AccessToTests newAccess = new AccessToTests();
+                    newAccess.setUser(currentUser);
+                    newAccess.setTest(test);
+                    return newAccess;
+                });
+
+        if (isCreator) {
+            if (!isMonitoringMode) {
+                test.setFolder(folder);
+                testRepository.save(test);
+            }
+            userAccess.setFolder(folder);
+            accessToTestsRepository.save(userAccess);
+        } else {
+            if (isMonitoringMode || test.getGroup() != null) {
+                userAccess.setFolder(folder);
+                accessToTestsRepository.save(userAccess);
+            } else {
+                throw new AccessDeniedException("Только создатель теста может добавлять тест в папку");
+            }
+        }
+
+        return test.toDto();
+    }
+
 
     public List<TestDto> searchTests(String searchTerm) {
         List<Test> tests = testRepository.findByIdOrNameOrUuidMonitoring(searchTerm, searchTerm, searchTerm);
         return tests.stream().map(Test::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public TestDto moveTestBetweenFolders(String testId, Long sourceFolderId, Long targetFolderId) {
+        final User currentUser = userService.getCurrentUser();
+
+        Test test = testRepository.findByIdOrName(testId, testId)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+
+        Folder sourceFolder = folderRepository.findByIdAndUser(sourceFolderId, currentUser)
+                .orElseThrow(() -> new FolderNotFoundException("Исходная папка не найдена"));
+
+        Folder targetFolder = folderRepository.findByIdAndUser(targetFolderId, currentUser)
+                .orElseThrow(() -> new FolderNotFoundException("Целевая папка не найдена"));
+
+        AccessToTests userAccess = accessToTestsRepository.findAllByUserAndFolder(currentUser, sourceFolder)
+                .stream()
+                .filter(access -> access.getTest().equals(test))
+                .findFirst()
+                .orElseThrow(() -> new AccessDeniedException("У вас нет доступа к данному тесту в указанной папке"));
+
+        boolean isMonitoringMode = test.getUuidMonitoring() != null;
+        boolean isCreator = test.getCreator().equals(currentUser);
+
+        if (isCreator) {
+            if (!isMonitoringMode) {
+                test.setFolder(targetFolder);
+                testRepository.save(test);
+            }
+            userAccess.setFolder(targetFolder);
+            accessToTestsRepository.save(userAccess);
+        } else {
+            if (isMonitoringMode || test.getGroup() != null) {
+                userAccess.setFolder(targetFolder);
+                accessToTestsRepository.save(userAccess);
+            } else {
+                throw new AccessDeniedException("Только создатель теста может перемещать тест между папками");
+            }
+        }
+
+        return test.toDto();
+    }
+
+    @Transactional
+    public void deleteTest(String testId) {
+        final User currentUser = userService.getCurrentUser();
+
+        Test test = testRepository.findByIdOrName(testId, testId)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+
+        if (!test.getCreator().equals(currentUser)) {
+            throw new AccessDeniedException("Только создатель теста может его удалить");
+        }
+
+        List<AccessToTests> accessRecords = accessToTestsRepository.findAllByTest(test);
+        accessToTestsRepository.deleteAll(accessRecords);
+
+        testRepository.delete(test);
     }
 
     public void generateMonitoringIdForTest(String testId) {

@@ -7,15 +7,15 @@ import com.coursework.backend.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TestRepository extends JpaRepository<Test, String> {
     boolean existsById(String id);
     Test findById(Test test);
-
-    List<Test> findAllByCreatorAndFolder(User user, Folder folder);
     List<Test> findByIdOrNameOrUuidMonitoring(String id, String name, String uuidMonitoring);
 
     boolean existsByUuidMonitoring(String uuidMonitoring);
+    Optional<Test> findByIdOrName(String id, String name);
 
     default boolean existsByField(String fieldName, String value) {
         if ("uuid_training".equals(fieldName)) {

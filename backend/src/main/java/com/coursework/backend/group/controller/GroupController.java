@@ -18,6 +18,8 @@ public class GroupController {
 
     private final GroupService groupService;
 
+    //нужно добавить все группы, в которых состоит пользователь
+
     @GetMapping("/{groupId}/users")
     public Set<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
         return groupService.getUsersInGroup(groupId);

@@ -52,4 +52,22 @@ public class TestController {
     public TestDto assignTestToGroup(@Valid @RequestBody AssignTestToGroupDto assignTestToGroupDto) {
         return testService.assignTestToGroup(assignTestToGroupDto);
     }
+
+    @PostMapping("/add-to-folder")
+    public TestDto addTestToFolder(@RequestParam String testId, @RequestParam Long folderId) {
+        return testService.addTestToFolder(testId, folderId);
+    }
+
+    @PostMapping("/move")
+    public TestDto moveTest(@RequestParam String testId,
+                            @RequestParam Long sourceFolderId,
+                            @RequestParam Long targetFolderId) {
+        return testService.moveTestBetweenFolders(testId, sourceFolderId, targetFolderId);
+    }
+
+    @DeleteMapping("/delete/{testId}")
+    public void deleteTest(@PathVariable String testId) {
+        testService.deleteTest(testId);
+    }
+
 }

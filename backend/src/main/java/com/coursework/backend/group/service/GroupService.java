@@ -34,6 +34,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final UserGroupRoleRepository userGroupRoleRepository;
 
+    //список пользователей в группе
     public Set<GroupUserDto> getUsersInGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));

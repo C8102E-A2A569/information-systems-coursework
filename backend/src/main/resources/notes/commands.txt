@@ -80,7 +80,8 @@ curl --location 'http://localhost:8080/tests/create' \
 --data '{
     "name": "Math_Test1",
     "folderId": 4,
-    "groupId": 2
+    "groupId": 2,
+    "monitoringMode": true
 }'
 
 //SEARCH TEST
@@ -95,3 +96,34 @@ curl --location 'http://localhost:8080/tests/assign-group' \
     "testId": "ff005d95",
     "groupId": 2
 }'
+
+//ADD TEST TO FOLDER
+curl -X POST "http://localhost:8080/tests/add-to-folder?testId=test123&folderId=1"
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k'
+
+//MOVE TEST
+curl -X POST 'http://localhost:8080/tests/move' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k' \
+  -d 'testId=abc12345' \
+  -d 'sourceFolderId=1' \
+  -d 'targetFolderId=2'
+
+//DELETE TEST
+curl -X DELETE 'http://localhost:8080/tests/delete/abc123' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkzODQzOTIsImV4cCI6MTczOTUyODM5Mn0.ix329xCh8l_svT3ePaUM3EgBMbV7EOl0thV2G4BWF5k'
+
+
+Ок. Итого:
+- редактирование тестов
+- после прохождения теста в режиме прохождения, он появляется в папке results
+
+//Сделано
+- только админ может добавлять тесты в группу
+- у не админов тест в режиме прохождения хранится только в группе(так как добавлять в папку его нельзя)
+- перемещение своего теста и чужого теста в режиме обучения в другую папку
+- добавление чужого теста в режиме обучения в свою папку
+- юзер может добавить тест в режиме обучения к себе в папку и (только потом редактировать его)
+- юзер не может добавлять тест в режиме прохождения к себе в папку и (редактировать его)
+- юзер может делиться тестом в режиме прохождения

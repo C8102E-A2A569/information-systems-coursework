@@ -13,4 +13,5 @@ public class CreateTestDto {
     private String name;
     private Long folderId;
     private Long groupId;
+    private boolean monitoringMode;
 }
