@@ -1,6 +1,5 @@
 package com.coursework.backend.test.model;
 
-import com.coursework.backend.folder.dto.FolderDto;
 import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.test.dto.TestDto;
@@ -74,6 +73,7 @@ public class Test {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         return uuid.substring(0, Math.min(length, uuid.length()));
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

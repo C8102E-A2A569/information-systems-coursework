@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -44,6 +45,9 @@ public class Results {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @OneToMany(mappedBy = "results", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Answers> answers;
 
     public enum Status {
         NOT_STARTED,

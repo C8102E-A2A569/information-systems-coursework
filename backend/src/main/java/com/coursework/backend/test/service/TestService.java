@@ -261,6 +261,7 @@ public class TestService {
     }
 
 //    TODO: Можно добавить более подходящие ошибки
+//    TODO: Добавить логику отслеживания количества попыток пользователя
     public TestForTrainingResponse getTestForTraining(String id) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(id).orElseThrow(() ->
@@ -281,7 +282,8 @@ public class TestService {
         return TestForTrainingResponse.fromTest(test);
     }
 
-//    TODO: Прикрутить время прохождения теста
+//    TODO: Прикрутить время прохождения теста (должно выполняться триггером)
+//    TODO: Добавить логику отслеживания количества попыток пользователя
     public void checkTrainingResult(TestForCheck testForCheck) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(testForCheck.getId()).orElseThrow(() ->
@@ -301,8 +303,13 @@ public class TestService {
         Integer questionsPointsSum = 0;
         Integer correctQuestionsPointsSum = 0;
         Boolean isContainsTextAnswers = false;
-        final var results = resultsRepository.findByUserAndTest(currentUser, test).orElseThrow(() ->
-                new IllegalArgumentException("Пользователь не начинал проходить данный тест"));
+        final var results = resultsRepository.findByUserAndTest(currentUser, test).orElseThrow(
+                () -> new IllegalArgumentException("Пользователь не начинал проходить данный тест")
+        );
+
+        if (results.getStatus() != Results.Status.NOT_STARTED)
+            throw new IllegalArgumentException("Пользователь уже завершил прохождение данного теста");
+
         results.setEndTime(LocalDateTime.now());
 
         for (final var questionForCheck : testForCheck.getQuestionsForCheck()) {
