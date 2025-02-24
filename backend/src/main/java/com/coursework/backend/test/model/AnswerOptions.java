@@ -1,6 +1,5 @@
-package com.coursework.backend.answerOptions.model;
+package com.coursework.backend.test.model;
 
-import com.coursework.backend.question.model.Question;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

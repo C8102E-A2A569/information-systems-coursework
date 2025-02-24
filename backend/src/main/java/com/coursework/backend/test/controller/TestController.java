@@ -6,10 +6,7 @@ import com.coursework.backend.folder.repository.FolderRepository;
 import com.coursework.backend.folder.service.FolderService;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.group.service.GroupService;
-import com.coursework.backend.test.dto.AssignTestToGroupDto;
-import com.coursework.backend.test.dto.CreateTestDto;
-import com.coursework.backend.test.dto.TestDto;
-import com.coursework.backend.test.dto.TestRequest;
+import com.coursework.backend.test.dto.*;
 import com.coursework.backend.test.model.Test;
 import com.coursework.backend.test.service.TestService;
 import com.coursework.backend.user.model.User;
@@ -70,4 +67,8 @@ public class TestController {
         testService.deleteTest(testId);
     }
 
+    @GetMapping("/training/{trainingId}")
+    public TestForTrainingRequest getTestForTraining(@PathVariable String trainingId) {
+        return testService.getTestForTraining(trainingId);
+    }
 }

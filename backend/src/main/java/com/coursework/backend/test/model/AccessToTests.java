@@ -32,5 +32,4 @@ public class AccessToTests {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id", referencedColumnName = "id", nullable = true)
     private Folder folder;
-
 }

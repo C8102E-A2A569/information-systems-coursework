@@ -22,6 +22,6 @@ public class TestDto {
     String name;
     Integer points;
     Long groupId;
-    Long folderId;
+//    Long folderId;
 }
 

@@ -1,4 +1,4 @@
-package com.coursework.backend.question.model;
+package com.coursework.backend.test.model;
 
 import com.coursework.backend.test.model.Test;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -36,7 +38,10 @@ public class Question {
     @Column(name = "type", nullable = false)
     private Type type;
 
-    public static enum Type{
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AnswerOptions> answerOptions;
+
+    public static enum Type {
         TEXT,
         RADIOBUTTON,
         CHECKBOX

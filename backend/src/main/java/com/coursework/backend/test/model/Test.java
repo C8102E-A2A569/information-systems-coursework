@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -43,15 +44,20 @@ public class Test {
     @JoinColumn(name = "group_id", referencedColumnName = "id")
     private Group group;
 
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Question> questions;
+
+/*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id", referencedColumnName = "id")
     private Folder folder;
+*/
 
     public Test(String name, User creator, Group group, Folder folder) {
         this.creator = creator;
         this.name = name;
         this.group = group;
-        this.folder = folder;
+//        this.folder = folder;
     }
 
     @PrePersist
@@ -87,7 +93,7 @@ public class Test {
                 .name(this.name)
                 .points(this.points)
                 .groupId(this.group  != null ? this.group.getId() : null)
-                .folderId(this.folder != null ? this.folder.getId() : null)
+//                .folderId(this.folder != null ? this.folder.getId() : null)
                 .build();
     }
 }

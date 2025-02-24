@@ -12,6 +12,7 @@ import com.coursework.backend.group.repository.GroupRepository;
 import com.coursework.backend.test.dto.AssignTestToGroupDto;
 import com.coursework.backend.test.dto.CreateTestDto;
 import com.coursework.backend.test.dto.TestDto;
+import com.coursework.backend.test.dto.TestForTrainingRequest;
 import com.coursework.backend.test.model.AccessToTests;
 import com.coursework.backend.test.model.Test;
 import com.coursework.backend.test.repository.AccessToTestsRepository;
@@ -171,7 +172,7 @@ public class TestService {
 
         if (isCreator) {
             if (!isMonitoringMode) {
-                test.setFolder(folder);
+//                test.setFolder(folder);
                 testRepository.save(test);
             }
             userAccess.setFolder(folder);
@@ -218,7 +219,7 @@ public class TestService {
 
         if (isCreator) {
             if (!isMonitoringMode) {
-                test.setFolder(targetFolder);
+//                test.setFolder(targetFolder);
                 testRepository.save(test);
             }
             userAccess.setFolder(targetFolder);
@@ -261,6 +262,19 @@ public class TestService {
         testRepository.save(test);
     }
 
+//    TODO: Можно добавить более подходящие ошибки
+    public TestForTrainingRequest getTestForTraining(String id) {
+        final var currentUser = userService.getCurrentUser();
+        final var test = testRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Не удалось найти заданный тест")
+        );
+        if (!accessToTestsRepository.existsByUserAndTest(currentUser, test)) {
+            throw new IllegalArgumentException("Данный пользователь не имеет доступа для прохождения заданного теста");
+        }
+
+        return TestForTrainingRequest.fromTest(test);
+    }
+
     private String generateUniqueIdForField(String fieldName) {
         String generatedId;
         do {
@@ -269,5 +283,4 @@ public class TestService {
 
         return generatedId;
     }
-
 }
