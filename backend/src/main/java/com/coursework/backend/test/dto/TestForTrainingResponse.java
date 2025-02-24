@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestForTrainingRequest {
+public class TestForTrainingResponse {
     private String id;
 
     private String name;
@@ -21,14 +21,14 @@ public class TestForTrainingRequest {
 
     private Integer points;
 
-    private List<QuestionForTrainingRequest> questions;
+    private List<QuestionForTrainingResponse> questions;
 
-    public static TestForTrainingRequest fromTest(Test test) {
+    public static TestForTrainingResponse fromTest(Test test) {
         final var testCreatorName = test.getCreator().getName();
         final var testQuestions = test.getQuestions() != null
-                ? test.getQuestions().stream().map(QuestionForTrainingRequest::fromQuestion).toList()
+                ? test.getQuestions().stream().map(QuestionForTrainingResponse::fromQuestion).toList()
                 : null;
-        return TestForTrainingRequest.builder()
+        return TestForTrainingResponse.builder()
                 .id(test.getId())
                 .name(test.getName())
                 .points(test.getPoints())

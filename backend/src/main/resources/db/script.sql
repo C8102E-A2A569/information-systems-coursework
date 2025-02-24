@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS "results" (
      "end_time" TIMESTAMP,
      "test_time" TIMESTAMP,
     "total_points" double precision,
+    "status" VARCHAR(20),
 
      CONSTRAINT "FK_results_user_login"
          FOREIGN KEY ("user_login")

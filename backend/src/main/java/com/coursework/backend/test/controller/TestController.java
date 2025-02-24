@@ -1,16 +1,7 @@
 package com.coursework.backend.test.controller;
 
-import com.coursework.backend.folder.dto.FolderDto;
-import com.coursework.backend.folder.model.Folder;
-import com.coursework.backend.folder.repository.FolderRepository;
-import com.coursework.backend.folder.service.FolderService;
-import com.coursework.backend.group.model.Group;
-import com.coursework.backend.group.service.GroupService;
 import com.coursework.backend.test.dto.*;
-import com.coursework.backend.test.model.Test;
 import com.coursework.backend.test.service.TestService;
-import com.coursework.backend.user.model.User;
-import com.coursework.backend.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +59,12 @@ public class TestController {
     }
 
     @GetMapping("/training/{trainingId}")
-    public TestForTrainingRequest getTestForTraining(@PathVariable String trainingId) {
+    public TestForTrainingResponse getTestForTraining(@PathVariable String trainingId) {
         return testService.getTestForTraining(trainingId);
+    }
+
+    @PostMapping("training/send")
+    public void checkTrainingResult(@RequestBody TestForCheck testForCheck) {
+        testService.checkTrainingResult(testForCheck);
     }
 }

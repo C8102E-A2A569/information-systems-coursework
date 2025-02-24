@@ -10,13 +10,8 @@ import com.coursework.backend.folder.repository.FolderRepository;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.group.repository.GroupRepository;
 import com.coursework.backend.test.dto.*;
-import com.coursework.backend.test.model.AccessToTests;
-import com.coursework.backend.test.model.AnswerOptions;
-import com.coursework.backend.test.model.Question;
-import com.coursework.backend.test.model.Test;
-import com.coursework.backend.test.repository.AccessToTestsRepository;
-import com.coursework.backend.test.repository.QuestionRepository;
-import com.coursework.backend.test.repository.TestRepository;
+import com.coursework.backend.test.model.*;
+import com.coursework.backend.test.repository.*;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
 import com.coursework.backend.userGroupRole.model.Role;
@@ -26,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +35,9 @@ public class TestService {
     private final GroupRepository groupRepository;
     private final AccessToTestsRepository accessToTestsRepository;
     private final QuestionRepository questionRepository;
+    private final ResultsRepository resultsRepository;
+    private final AnswerOptionsRepository answerOptionsRepository;
+    private final AnswersRepository answersRepository;
 
     public List<TestDto> getRootTestsByUser() {
         final User user = userService.getCurrentUser();
@@ -189,7 +188,6 @@ public class TestService {
         return test.toDto();
     }
 
-
     public List<TestDto> searchTests(String searchTerm) {
         List<Test> tests = testRepository.findByIdOrNameOrUuidMonitoring(searchTerm, searchTerm, searchTerm);
         return tests.stream().map(Test::toDto).collect(Collectors.toList());
@@ -263,7 +261,7 @@ public class TestService {
     }
 
 //    TODO: Можно добавить более подходящие ошибки
-    public TestForTrainingRequest getTestForTraining(String id) {
+    public TestForTrainingResponse getTestForTraining(String id) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Не удалось найти заданный тест")
@@ -272,10 +270,18 @@ public class TestService {
             throw new IllegalArgumentException("Данный пользователь не имеет доступа для прохождения заданного теста");
         }
 
-        return TestForTrainingRequest.fromTest(test);
+        final var results = Results.builder()
+                .startTime(LocalDateTime.now())
+                .user(currentUser)
+                .test(test)
+                .status(Results.Status.NOT_STARTED)
+                .build();
+        resultsRepository.save(results);
+
+        return TestForTrainingResponse.fromTest(test);
     }
 
-//    TODO: Изменить возвращаемый тип
+//    TODO: Прикрутить время прохождения теста
     public void checkTrainingResult(TestForCheck testForCheck) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(testForCheck.getId()).orElseThrow(() ->
@@ -295,6 +301,10 @@ public class TestService {
         Integer questionsPointsSum = 0;
         Integer correctQuestionsPointsSum = 0;
         Boolean isContainsTextAnswers = false;
+        final var results = resultsRepository.findByUserAndTest(currentUser, test).orElseThrow(() ->
+                new IllegalArgumentException("Пользователь не начинал проходить данный тест"));
+        results.setEndTime(LocalDateTime.now());
+
         for (final var questionForCheck : testForCheck.getQuestionsForCheck()) {
 //            Проверка, были ли уже дан ответ на данный вопрос
             if (questionIdsSet.contains(questionForCheck.getId()))
@@ -305,18 +315,25 @@ public class TestService {
                     () -> new IllegalArgumentException("Не удалось идентифицировать вопрос")
             );
 
+            final var answer = Answers.builder().results(results).question(currentQuestion).build();
             if (!Objects.equals(currentQuestion.getTest().getId(), testForCheck.getId()))
                 throw new IllegalArgumentException("Вопрос не принадлежит данному тесту");
 
             questionsPointsSum += currentQuestion.getPoints();
             switch (currentQuestion.getType()) {
                 case TEXT:
+                    results.setStatus(Results.Status.AWAITING_APPROVAL);
+                    answer.setUserAnswer(questionForCheck.getTextAnswer());
                     isContainsTextAnswers = true;
                     break;
                 case CHECKBOX:
-                    final var correctOptions = currentQuestion.getAnswerOptions().stream()
-                            .filter(AnswerOptions::getIsCorrect)
+                    final var correctOptionIds = currentQuestion.getAnswerOptions().stream()
+                            .filter(AnswerOptions::getIsCorrect).map(AnswerOptions::getId)
                             .collect(Collectors.toSet());
+                    var pointsForAnswer = getPointsForCheckboxAnswer(questionForCheck, correctOptionIds, currentQuestion);
+                    correctQuestionsPointsSum += pointsForAnswer;
+                    answer.setPoints(pointsForAnswer);
+                    answer.setUserAnswer(String.join(";", questionForCheck.getCheckboxAnswersId().stream().map(String::valueOf).toArray(String[]::new)));
                     break;
                 case RADIOBUTTON:
                     final var correctOption = currentQuestion.getAnswerOptions()
@@ -324,11 +341,39 @@ public class TestService {
                             .filter(AnswerOptions::getIsCorrect)
                             .findFirst().orElseThrow(
                                     () -> new IllegalArgumentException("Не удалось найти правильный ответ"));
-                    if (Objects.equals(correctOption.getId(), questionForCheck.getId()))
+                    if (Objects.equals(correctOption.getId(), questionForCheck.getId())) {
                         correctQuestionsPointsSum += currentQuestion.getPoints();
+                        answer.setPoints(currentQuestion.getPoints());
+                    } else {
+                        answer.setPoints(0);
+                    }
+                    answer.setUserAnswer(questionForCheck.getRadiobuttonAnswerId().toString());
                     break;
             }
+
+            answersRepository.save(answer);
         }
+
+        if (test.getPoints() != null)
+            results.setTotalPoints(((double)(correctQuestionsPointsSum * test.getPoints()) / questionsPointsSum));
+        results.setStatus(isContainsTextAnswers ? Results.Status.AWAITING_APPROVAL : Results.Status.APPROVED);
+
+        resultsRepository.save(results);
+    }
+
+//    TODO: Возможна ошибка при вычеслении баллов для checkbox ответов
+    private static int getPointsForCheckboxAnswer(TestForCheck.QuestionForCheck questionForCheck, Set<Long> correctOptionIds, Question currentQuestion) {
+        int tp = 0, fp = 0, tn = 0, fn = 0;
+        for (final var userOptionId : questionForCheck.getCheckboxAnswersId()) {
+            if (correctOptionIds.contains(userOptionId)) tp++;
+            else fn++;
+        }
+        fp = correctOptionIds.size() - tp;
+        tn = currentQuestion.getAnswerOptions().size() - tp - fp - fn;
+        var pointsForAnswer = tp + tn - fp - fn;
+        if (pointsForAnswer < 0) pointsForAnswer = 0;
+        if (pointsForAnswer > 0) pointsForAnswer = currentQuestion.getPoints();
+        return pointsForAnswer;
     }
 
     private String generateUniqueIdForField(String fieldName) {
