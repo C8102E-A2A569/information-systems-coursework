@@ -280,6 +280,9 @@ public class TestService {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(testForCheck.getId()).orElseThrow(() ->
                 new IllegalArgumentException("Заданного теста не найдено"));
+        if (!accessToTestsRepository.existsByUserAndTest(currentUser, test)) {
+            throw new IllegalArgumentException("Данный пользователь не имеет доступа для прохождения заданного теста");
+        }
 //        Проверка на количество ответов
         final var questionCountDifference = testForCheck.getQuestionsForCheck().size() - test.getQuestions().size();
         if (questionCountDifference < 0)
