@@ -305,10 +305,9 @@ public class TestService {
                     () -> new IllegalArgumentException("Не удалось идентифицировать вопрос")
             );
 
-            if (currentQuestion.getTest().getId() != testForCheck.getId())
+            if (!Objects.equals(currentQuestion.getTest().getId(), testForCheck.getId()))
                 throw new IllegalArgumentException("Вопрос не принадлежит данному тесту");
 
-//            TODO: Добавить проверку на доступ к тесту
             questionsPointsSum += currentQuestion.getPoints();
             switch (currentQuestion.getType()) {
                 case TEXT:
