@@ -9,13 +9,13 @@ import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.folder.repository.FolderRepository;
 import com.coursework.backend.group.model.Group;
 import com.coursework.backend.group.repository.GroupRepository;
-import com.coursework.backend.test.dto.AssignTestToGroupDto;
-import com.coursework.backend.test.dto.CreateTestDto;
-import com.coursework.backend.test.dto.TestDto;
-import com.coursework.backend.test.dto.TestForTrainingRequest;
+import com.coursework.backend.test.dto.*;
 import com.coursework.backend.test.model.AccessToTests;
+import com.coursework.backend.test.model.AnswerOptions;
+import com.coursework.backend.test.model.Question;
 import com.coursework.backend.test.model.Test;
 import com.coursework.backend.test.repository.AccessToTestsRepository;
+import com.coursework.backend.test.repository.QuestionRepository;
 import com.coursework.backend.test.repository.TestRepository;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
@@ -26,8 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +38,7 @@ public class TestService {
     private final FolderRepository folderRepository;
     private final GroupRepository groupRepository;
     private final AccessToTestsRepository accessToTestsRepository;
+    private final QuestionRepository questionRepository;
 
     public List<TestDto> getRootTestsByUser() {
         final User user = userService.getCurrentUser();
@@ -273,6 +273,60 @@ public class TestService {
         }
 
         return TestForTrainingRequest.fromTest(test);
+    }
+
+//    TODO: Изменить возвращаемый тип
+    public void checkTrainingResult(TestForCheck testForCheck) {
+        final var currentUser = userService.getCurrentUser();
+        final var test = testRepository.findById(testForCheck.getId()).orElseThrow(() ->
+                new IllegalArgumentException("Заданного теста не найдено"));
+//        Проверка на количество ответов
+        final var questionCountDifference = testForCheck.getQuestionsForCheck().size() - test.getQuestions().size();
+        if (questionCountDifference < 0)
+            throw new IllegalArgumentException("Были даны ответы не на все вопросы");
+        if (questionCountDifference > 0)
+            throw new IllegalArgumentException("Пришло больше ответов, чем ожидалось");
+//        Проверка на уникальность вопросов
+        Set<Long> questionIdsSet = new HashSet<>();
+        final var testPoints = test.getPoints();
+        Integer questionsPointsSum = 0;
+        Integer correctQuestionsPointsSum = 0;
+        Boolean isContainsTextAnswers = false;
+        for (final var questionForCheck : testForCheck.getQuestionsForCheck()) {
+//            Проверка, были ли уже дан ответ на данный вопрос
+            if (questionIdsSet.contains(questionForCheck.getId()))
+                throw new IllegalArgumentException("Ответ на данный вопрос уже был дан");
+            questionIdsSet.add(questionForCheck.getId());
+
+            final var currentQuestion = questionRepository.findById(questionForCheck.getId()).orElseThrow(
+                    () -> new IllegalArgumentException("Не удалось идентифицировать вопрос")
+            );
+
+            if (currentQuestion.getTest().getId() != testForCheck.getId())
+                throw new IllegalArgumentException("Вопрос не принадлежит данному тесту");
+
+//            TODO: Добавить проверку на доступ к тесту
+            questionsPointsSum += currentQuestion.getPoints();
+            switch (currentQuestion.getType()) {
+                case TEXT:
+                    isContainsTextAnswers = true;
+                    break;
+                case CHECKBOX:
+                    final var correctOptions = currentQuestion.getAnswerOptions().stream()
+                            .filter(AnswerOptions::getIsCorrect)
+                            .collect(Collectors.toSet());
+                    break;
+                case RADIOBUTTON:
+                    final var correctOption = currentQuestion.getAnswerOptions()
+                            .stream()
+                            .filter(AnswerOptions::getIsCorrect)
+                            .findFirst().orElseThrow(
+                                    () -> new IllegalArgumentException("Не удалось найти правильный ответ"));
+                    if (Objects.equals(correctOption.getId(), questionForCheck.getId()))
+                        correctQuestionsPointsSum += currentQuestion.getPoints();
+                    break;
+            }
+        }
     }
 
     private String generateUniqueIdForField(String fieldName) {
