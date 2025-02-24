@@ -225,7 +225,7 @@ const fetchTestsFromFolder = async (folderId) => {
                 console.error('Токен не найден');
                 return;
             }
-            const response = await fetch(`http://localhost:8080/tests/start`, {
+            const response = await fetch(`http://localhost:8080/tests/training/${testId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -233,10 +233,21 @@ const fetchTestsFromFolder = async (folderId) => {
                 },
             });
             if (!response.ok) {
-                throw new Error('Ошибка при получении вопросов');
+                console.error('Ошибка при получении вопросов');
             }
-            const questionsData = await response.json();
-            navigate('/test-page', { state: { questions: questionsData } });
+            console.log("aaaaaaaaa");
+            const testData = await response.json();
+            console.log(testData);
+            navigate('/test-page', {
+                state: {
+                    testInfo: {
+                        id: testData.id,
+                        name: testData.name,
+                        points: testData.points
+                    },
+                    questions: testData.questions
+                }
+            });
         } catch (error) {
             console.error('Ошибка при загрузке данных теста:', error);
         }

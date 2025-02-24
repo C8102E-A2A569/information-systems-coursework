@@ -1,0 +1,115 @@
+.testPage {
+    background-color: #110031;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.Test {
+    width: 50%;
+    height: 100%;
+    background-color: #69f8d0;
+    color: #00082a;
+    font-size: 18px;
+    overflow-y: auto;
+}
+
+.Test:hover {
+    box-shadow: 0 0 5px #69f8d0;
+}
+
+.test-header {
+    font-size: 22px;
+    text-align: center;
+    border-bottom: 1px solid #15003e;
+    padding: 12px;
+    font-family:  "Comic Sans MS", fantasy;
+    background-color: rgba(59, 73, 255, 0.82);
+    color: #f1eac9;
+
+}
+.test-name {
+    margin-top: 10px;
+}
+.points{
+    margin-top: 10px;
+}
+.points, .questionsCount{
+    font-size: 16px;
+    text-align: left;
+    margin-left: 50px;
+    color: #00153a;
+}
+
+
+.questions {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.questions .question{
+    background-color: rgba(255, 97, 201, 0.96);
+    margin: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    width: 80%;
+    color: #020031;
+}
+
+.questionPoints {
+    font-size: 16px;
+    color: #0a0ca7;
+    margin-bottom: 10px;
+}
+
+.questions input[type="text"] {
+    margin-top: 5px;
+    border: 1px solid #110031;
+    background-color: #e9b2fb;
+    margin-left: 25px;
+    color: #020031;
+    outline: none;
+}
+
+.questions input[type="text"]::placeholder{
+    color: #6f59ab;
+}
+.radio-option, .checkbox-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-left: -110px;
+
+}
+
+.radio-option input[type="radio"],
+.checkbox-option input[type="checkbox"] {
+    margin-right: -130px;
+    text-align: left;
+}
+
+.question:hover {
+    background-color: #ff71cd;
+    box-shadow: 0 0 3px black;
+}
+
+.Test .start {
+    width: 100px;
+    height: 32px;
+    font-size: 17px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.Test .start:hover {
+    box-shadow: 0 0 1px black;
+}
+
+.Test::-webkit-scrollbar {
+    width: 0;
+}
