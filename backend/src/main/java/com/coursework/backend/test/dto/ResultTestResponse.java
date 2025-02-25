@@ -76,7 +76,6 @@ public class ResultTestResponse {
 
         private List<AnswerOptionResult> results;
 
-//        TODO: исправить, чтобы возвращал текстовый ответ
         public static QuestionResult fromQuestionAndAnswer(Question question, Answers answer) {
             List<AnswerOptionResult> results;
             if (question.getType() != Question.Type.TEXT) {
