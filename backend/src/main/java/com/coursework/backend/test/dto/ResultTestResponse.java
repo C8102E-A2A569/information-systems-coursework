@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,10 +78,16 @@ public class ResultTestResponse {
 
 //        TODO: исправить, чтобы возвращал текстовый ответ
         public static QuestionResult fromQuestionAndAnswer(Question question, Answers answer) {
-            final var results = question.getAnswerOptions()
-                    .stream()
-                    .map((option) -> AnswerOptionResult.fromAnswerOptionsAndAnswer(option, answer))
-                    .toList();
+            List<AnswerOptionResult> results;
+            if (question.getType() != Question.Type.TEXT) {
+                results = question.getAnswerOptions()
+                        .stream()
+                        .map((option) -> AnswerOptionResult.fromAnswerOptionsAndAnswer(option, answer))
+                        .toList();
+            } else {
+                results = new ArrayList<>();
+                results.add(AnswerOptionResult.builder().option(answer.getUserAnswer()).isAnsweredByUser(true).build());
+            }
 
             return QuestionResult.builder()
                     .questionId(question.getId())

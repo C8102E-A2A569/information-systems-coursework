@@ -1,6 +1,5 @@
 package com.coursework.backend.test.service;
 
-
 import com.coursework.backend.exception.exceptions.AccessDeniedException;
 import com.coursework.backend.exception.exceptions.FolderNotFoundException;
 import com.coursework.backend.exception.exceptions.GroupNotFoundException;

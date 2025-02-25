@@ -18,7 +18,6 @@ public class ResultsService {
     private final UserService userService;
     private final AccessToTestsRepository accessToTestsRepository;
 
-    //    TODO: Изменить тип возвращаемого значения
     public ResultTestResponse getMyTestResult(String trainingId) {
         final var user = userService.getCurrentUser();
         final var test = testRepository.findById(trainingId).orElseThrow(
