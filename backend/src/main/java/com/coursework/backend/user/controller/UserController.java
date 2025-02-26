@@ -1,5 +1,6 @@
 package com.coursework.backend.user.controller;
 
+import com.coursework.backend.user.dto.AuthResponseDto;
 import com.coursework.backend.user.dto.PatchUserDto;
 import com.coursework.backend.user.dto.UserDto;
 import com.coursework.backend.user.model.User;
@@ -19,9 +20,9 @@ public class UserController {
         return userService.getByLogin(login);
     }
 
-    @PatchMapping("/{currentLogin}")
-    public UserDto patchUser(@PathVariable String currentLogin, @Valid @RequestBody PatchUserDto patchUserDto) {
-        return userService.updateUser(currentLogin, patchUserDto);
+    @PatchMapping("/profile")
+    public AuthResponseDto patchUser(@Valid @RequestBody PatchUserDto patchUserDto) {
+        return userService.patchUser(patchUserDto);
     }
 
 }
