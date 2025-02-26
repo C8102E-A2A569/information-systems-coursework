@@ -2,6 +2,7 @@ package com.coursework.backend.group.controller;
 
 import com.coursework.backend.group.dto.CreateGroupDto;
 import com.coursework.backend.group.dto.GroupDto;
+import com.coursework.backend.group.dto.GroupInListResponse;
 import com.coursework.backend.group.dto.PatchGroupDto;
 import com.coursework.backend.group.service.GroupService;
 import com.coursework.backend.user.dto.GroupUserDto;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -50,6 +53,13 @@ public class GroupController {
     @DeleteMapping("/remove-user/{groupId}/users/{userLogin}/admin/{adminLogin}")
     public void removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
         groupService.removeUserFromGroup(groupId, userLogin, adminLogin);
+    }
+
+
+
+    @GetMapping("/my")
+    public List<GroupInListResponse> getMyGroups() {
+        return groupService.getUserGroups();
     }
 }
 

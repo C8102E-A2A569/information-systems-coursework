@@ -1,6 +1,5 @@
 package com.coursework.backend.group.dto;
 
-import com.coursework.backend.userGroupRole.model.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

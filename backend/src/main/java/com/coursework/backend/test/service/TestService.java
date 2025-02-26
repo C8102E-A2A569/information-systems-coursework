@@ -13,7 +13,6 @@ import com.coursework.backend.test.model.*;
 import com.coursework.backend.test.repository.*;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
-import com.coursework.backend.userGroupRole.model.Role;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
 import com.coursework.backend.userGroupRole.repository.UserGroupRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +71,7 @@ public class TestService {
             group = groupRepository.findById(createTestDto.getGroupId())
                     .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-            if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+            if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, UserGroupRole.Role.ADMIN)) {
                 throw new AccessDeniedException("Только администратор группы может добавлять тесты");
             }
         }
@@ -121,7 +120,7 @@ public class TestService {
         Group group = groupRepository.findById(assignTestToGroupDto.getGroupId())
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-        if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+        if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, UserGroupRole.Role.ADMIN)) {
             throw new AccessDeniedException("Только администратор группы может добавлять тесты");
         }
 

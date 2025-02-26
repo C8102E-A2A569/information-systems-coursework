@@ -5,14 +5,14 @@ import com.coursework.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Data
 @Entity
-@Table(name = "user_group_roles")
-@Getter
-@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Table(name = "user_group_roles")
 public class UserGroupRole {
+
     @EmbeddedId
     private UserGroupRoleId id;
 
@@ -29,4 +29,19 @@ public class UserGroupRole {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    public enum Role {
+        ADMIN,
+        USER
+    }
+
+    @Data
+    @Builder
+    @Embeddable
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserGroupRoleId {
+        private Long groupId;
+        private String userLogin;
+    }
 }
