@@ -120,6 +120,9 @@ public class TestService {
 //                .creator(user)
 //                .id(trainingId)
 //                .uuidMonitoring(monitoringId)
+//                .build();
+//
+//
 //    }
 
     @Transactional
