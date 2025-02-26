@@ -108,19 +108,19 @@ public class TestService {
         return savedTest.toDto();
     }
 
-    public CreateTestResponse create(TestDto testDto, Integer folderId) {
-        final var user = userService.getCurrentUser();
-
-        final var trainingId = generateUniqueIdForField("uuid_training");
-        final var monitoringId = generateUniqueIdForField("uuid_monitoring");
-
-        final var test = Test.builder()
-                .name(testDto.getName())
-                .points(testDto.getPoints())
-                .creator(user)
-                .id(trainingId)
-                .uuidMonitoring(monitoringId)
-    }
+//    public CreateTestResponse create(TestDto testDto, Integer folderId) {
+//        final var user = userService.getCurrentUser();
+//
+//        final var trainingId = generateUniqueIdForField("uuid_training");
+//        final var monitoringId = generateUniqueIdForField("uuid_monitoring");
+//
+//        final var test = Test.builder()
+//                .name(testDto.getName())
+//                .points(testDto.getPoints())
+//                .creator(user)
+//                .id(trainingId)
+//                .uuidMonitoring(monitoringId)
+//    }
 
     @Transactional
     public TestPreviewDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
