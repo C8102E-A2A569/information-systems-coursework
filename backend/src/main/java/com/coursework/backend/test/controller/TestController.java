@@ -67,4 +67,9 @@ public class TestController {
     public void checkTrainingResult(@RequestBody TestForCheck testForCheck) {
         testService.checkTrainingResult(testForCheck);
     }
+
+    @GetMapping("training/search/{trainingId}")
+    public TestDto searchTrainingTest(@PathVariable String trainingId) {
+        return testService.searchTrainingTest(trainingId);
+    }
 }

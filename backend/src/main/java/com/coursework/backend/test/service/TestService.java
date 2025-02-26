@@ -389,4 +389,12 @@ public class TestService {
 
         return generatedId;
     }
+
+    public TestDto searchTrainingTest(String trainingId) {
+        final var test = testRepository.findById(trainingId).orElseThrow(
+                () -> new IllegalArgumentException("Заданного теста не существует")
+        );
+
+        return test.toDto();
+    }
 }

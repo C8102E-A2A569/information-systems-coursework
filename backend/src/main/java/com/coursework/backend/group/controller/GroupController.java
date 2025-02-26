@@ -24,7 +24,7 @@ public class GroupController {
     //нужно добавить все группы, в которых состоит пользователь
 
     @GetMapping("/{groupId}/users")
-    public Set<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
+    public List<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
         return groupService.getUsersInGroup(groupId);
     }
 
@@ -55,11 +55,8 @@ public class GroupController {
         groupService.removeUserFromGroup(groupId, userLogin, adminLogin);
     }
 
-
-
     @GetMapping("/my")
     public List<GroupInListResponse> getMyGroups() {
         return groupService.getUserGroups();
     }
 }
-

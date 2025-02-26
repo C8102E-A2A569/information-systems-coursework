@@ -14,6 +14,7 @@ import com.coursework.backend.user.service.UserService;
 import com.coursework.backend.userGroupRole.dto.UserGroupRoleDto;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
 import com.coursework.backend.userGroupRole.repository.UserGroupRoleRepository;
+import com.coursework.backend.userGroupRole.service.UserGroupRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,18 +32,20 @@ public class GroupService {
     private final UserRepository userRepository;
     private final UserGroupRoleRepository userGroupRoleRepository;
     private final UserService userService;
+    private final UserGroupRoleService userGroupRoleService;
 
     //список пользователей в группе
-    public Set<GroupUserDto> getUsersInGroup(Long groupId) {
+    public List<GroupUserDto> getUsersInGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
         return group.getUserGroupRoles().stream()
                 .map(userGroupRole -> new GroupUserDto(
                         userGroupRole.getUser().getLogin(),
-                        userGroupRole.getUser().getName()
+                        userGroupRole.getUser().getName(),
+                        userGroupRole.getRole()
                 ))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -170,7 +173,3 @@ public class GroupService {
         return userGroupRoleList.stream().map(GroupInListResponse::fromUserGroupRole).toList();
     }
 }
-
-
-
-

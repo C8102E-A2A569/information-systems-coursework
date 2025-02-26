@@ -92,7 +92,7 @@ public class Test {
                 .id(this.id)
                 .name(this.name)
                 .points(this.points)
-                .groupId(this.group  != null ? this.group.getId() : null)
+//                .groupId(this.group  != null ? this.group.getId() : null)
 //                .folderId(this.folder != null ? this.folder.getId() : null)
                 .build();
     }
