@@ -1,6 +1,5 @@
 package com.coursework.backend.test.model;
 
-import com.coursework.backend.test.model.Test;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

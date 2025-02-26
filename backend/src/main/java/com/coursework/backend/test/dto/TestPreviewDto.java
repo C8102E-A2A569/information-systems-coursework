@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TestPreviewDto {
     String id;
-    String monitoringId;
     String name;
     Integer points;
 }

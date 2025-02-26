@@ -15,6 +15,8 @@ public class AnswerOptionsDto {
 
     private String option;
 
+    private Boolean isCorrect;
+
     public static AnswerOptionsDto fromAnswerOptions(AnswerOptions options) {
         return AnswerOptionsDto.builder()
                 .id(options.getId())

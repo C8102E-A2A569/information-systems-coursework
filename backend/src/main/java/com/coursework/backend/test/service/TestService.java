@@ -108,22 +108,54 @@ public class TestService {
         return savedTest.toDto();
     }
 
-//    public CreateTestResponse create(TestDto testDto, Integer folderId) {
-//        final var user = userService.getCurrentUser();
-//
-//        final var trainingId = generateUniqueIdForField("uuid_training");
-//        final var monitoringId = generateUniqueIdForField("uuid_monitoring");
-//
-//        final var test = Test.builder()
-//                .name(testDto.getName())
-//                .points(testDto.getPoints())
-//                .creator(user)
-//                .id(trainingId)
-//                .uuidMonitoring(monitoringId)
-//                .build();
-//
-//
-//    }
+//    Метод сделан без дополнительных проверок
+    @Transactional
+    public TestPreviewDto create(TestDto testDto, Long folderId) {
+        final var user = userService.getCurrentUser();
+
+        final var trainingId = generateUniqueIdForField("uuid_training");
+
+        var test = Test.builder()
+                .name(testDto.getName())
+                .points(testDto.getPoints())
+                .creator(user)
+                .id(trainingId)
+                .uuidMonitoring(null)
+                .build();
+
+        test = testRepository.save(test);
+
+        for (final var questionDto : testDto.getQuestions()) {
+            var question = Question.builder()
+                    .question(questionDto.getQuestion())
+                    .type(questionDto.getType())
+                    .test(test)
+                    .points(questionDto.getPoints())
+                    .build();
+            question = questionRepository.save(question);
+
+            for (final var answerOptionsDto : questionDto.getAnswerOptions()) {
+                final var answerOption = AnswerOptions.builder()
+                        .option(answerOptionsDto.getOption())
+                        .isCorrect(answerOptionsDto.getIsCorrect())
+                        .question(question)
+                        .build();
+                answerOptionsRepository.save(answerOption);
+            }
+        }
+
+        Folder folder = null;
+        if (folderId != null)
+            folder = folderRepository.findByIdAndUser(folderId, user).orElse(null);
+        final var accessToTests = AccessToTests.builder().user(user).test(test).folder(folder).build();
+        accessToTestsRepository.save(accessToTests);
+
+        return TestPreviewDto.builder()
+                .id(test.getId())
+                .name(test.getName())
+                .points(test.getPoints())
+                .build();
+    }
 
     @Transactional
     public TestPreviewDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {

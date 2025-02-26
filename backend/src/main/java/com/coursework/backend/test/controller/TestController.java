@@ -37,10 +37,10 @@ public class TestController {
         return testService.createTest(createTestDto);
     }
 
-//    @PostMapping("create/{folderId}")
-//    public CreateTestResponse create(@RequestBody TestDto testDto, @PathVariable Integer folderId) {
-//        return testService.create(testDto, folderId);
-//    }
+    @PostMapping("/create/new")
+    public TestPreviewDto create(@RequestBody TestDto testDto, @RequestParam(defaultValue = "") Long folderId) {
+        return testService.create(testDto, folderId);
+    }
 
     @PostMapping("/assign-group")
     public TestPreviewDto assignTestToGroup(@Valid @RequestBody AssignTestToGroupDto assignTestToGroupDto) {
