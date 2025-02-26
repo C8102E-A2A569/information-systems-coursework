@@ -1,6 +1,7 @@
 package com.coursework.backend.test.repository;
 
 import com.coursework.backend.folder.model.Folder;
+import com.coursework.backend.group.model.Group;
 import com.coursework.backend.test.model.AccessToTests;
 import com.coursework.backend.test.model.Test;
 import com.coursework.backend.user.model.User;
@@ -13,9 +14,9 @@ public interface TestRepository extends JpaRepository<Test, String> {
     boolean existsById(String id);
     Test findById(Test test);
     List<Test> findByIdOrNameOrUuidMonitoring(String id, String name, String uuidMonitoring);
-
     boolean existsByUuidMonitoring(String uuidMonitoring);
     Optional<Test> findByIdOrName(String id, String name);
+    List<Test> findAllByGroup(Group group);
 
     default boolean existsByField(String fieldName, String value) {
         if ("uuid_training".equals(fieldName)) {

@@ -1,6 +1,5 @@
 package com.coursework.backend.userGroupRole.controller;
 
-import com.coursework.backend.userGroupRole.model.Role;
 import com.coursework.backend.userGroupRole.service.UserGroupRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

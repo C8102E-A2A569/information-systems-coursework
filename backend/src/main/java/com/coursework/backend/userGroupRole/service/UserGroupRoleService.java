@@ -6,7 +6,6 @@ import com.coursework.backend.group.model.Group;
 import com.coursework.backend.group.repository.GroupRepository;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.repository.UserRepository;
-import com.coursework.backend.userGroupRole.model.Role;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
 import com.coursework.backend.userGroupRole.repository.UserGroupRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,4 +22,3 @@ public class UserGroupRoleService {
         userGroupRoleRepository.save(userGroupRole);
     }
 }
-

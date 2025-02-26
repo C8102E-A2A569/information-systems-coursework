@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionForTrainingResponse {
+public class QuestionDto {
     private Long id;
 
     private String question;
@@ -21,13 +21,13 @@ public class QuestionForTrainingResponse {
 
     private Question.Type type;
 
-    private List<AnswerOptionsTrainingDto> answerOptions;
+    private List<AnswerOptionsDto> answerOptions;
 
-    public static QuestionForTrainingResponse fromQuestion(Question question) {
+    public static QuestionDto fromQuestion(Question question) {
         final var answerOptions = question.getAnswerOptions() != null
-                ? question.getAnswerOptions().stream().map(AnswerOptionsTrainingDto::fromAnswerOptions).toList()
+                ? question.getAnswerOptions().stream().map(AnswerOptionsDto::fromAnswerOptions).toList()
                 : null;
-        return QuestionForTrainingResponse.builder()
+        return QuestionDto.builder()
                 .id(question.getId())
                 .question(question.getQuestion())
                 .points(question.getPoints())

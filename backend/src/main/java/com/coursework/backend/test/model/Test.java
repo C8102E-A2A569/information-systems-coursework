@@ -2,7 +2,7 @@ package com.coursework.backend.test.model;
 
 import com.coursework.backend.folder.model.Folder;
 import com.coursework.backend.group.model.Group;
-import com.coursework.backend.test.dto.TestDto;
+import com.coursework.backend.test.dto.TestPreviewDto;
 import com.coursework.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -87,12 +87,12 @@ public class Test {
         return Objects.hash(id);
     }
 
-    public TestDto toDto() {
-        return TestDto.builder()
+    public TestPreviewDto toDto() {
+        return TestPreviewDto.builder()
                 .id(this.id)
                 .name(this.name)
                 .points(this.points)
-                .groupId(this.group  != null ? this.group.getId() : null)
+//                .groupId(this.group  != null ? this.group.getId() : null)
 //                .folderId(this.folder != null ? this.folder.getId() : null)
                 .build();
     }

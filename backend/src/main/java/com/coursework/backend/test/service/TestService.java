@@ -1,6 +1,5 @@
 package com.coursework.backend.test.service;
 
-
 import com.coursework.backend.exception.exceptions.AccessDeniedException;
 import com.coursework.backend.exception.exceptions.FolderNotFoundException;
 import com.coursework.backend.exception.exceptions.GroupNotFoundException;
@@ -14,7 +13,6 @@ import com.coursework.backend.test.model.*;
 import com.coursework.backend.test.repository.*;
 import com.coursework.backend.user.model.User;
 import com.coursework.backend.user.service.UserService;
-import com.coursework.backend.userGroupRole.model.Role;
 import com.coursework.backend.userGroupRole.model.UserGroupRole;
 import com.coursework.backend.userGroupRole.repository.UserGroupRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +37,7 @@ public class TestService {
     private final AnswerOptionsRepository answerOptionsRepository;
     private final AnswersRepository answersRepository;
 
-    public List<TestDto> getRootTestsByUser() {
+    public List<TestPreviewDto> getRootTestsByUser() {
         final User user = userService.getCurrentUser();
         List<AccessToTests> accessToTests = accessToTestsRepository.findAllByUserAndFolder(user, null);
 
@@ -48,7 +46,7 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
-    public List<TestDto> getTestsByUserAndFolder(Long folderId) {
+    public List<TestPreviewDto> getTestsByUserAndFolder(Long folderId) {
         final User user = userService.getCurrentUser();
         final var folder = folderRepository.findByIdAndUser(folderId, user)
                 .orElseThrow(() -> new RuntimeException("Папка не найдена"));
@@ -58,8 +56,31 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<GroupTestDto> getGroupTests(Long groupId) {
+        final User currentUser = userService.getCurrentUser();
+        // Проверяем, состоит ли пользователь в группе
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+        if (!userGroupRoleRepository.existsByGroupAndUser(group, currentUser)) {
+            throw new AccessDeniedException("Пользователь не состоит в данной группе");
+        }
+        List<Test> tests = testRepository.findAllByGroup(group);
+
+        // Преобразуем тесты в GroupTestDto
+        return tests.stream()
+                .map(test -> GroupTestDto.builder()
+                        .id(test.getId())
+                        .name(test.getName())
+                        .points(test.getPoints())
+                        .mode(test.getUuidMonitoring() != null ? "monitoring" : "training")
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Deprecated
     @Transactional
-    public TestDto createTest(CreateTestDto createTestDto) {
+    public TestPreviewDto createTest(CreateTestDto createTestDto) {
         final User currentUser = userService.getCurrentUser();
 
         Folder folder = null;
@@ -73,7 +94,7 @@ public class TestService {
             group = groupRepository.findById(createTestDto.getGroupId())
                     .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-            if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+            if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, UserGroupRole.Role.ADMIN)) {
                 throw new AccessDeniedException("Только администратор группы может добавлять тесты");
             }
         }
@@ -108,8 +129,58 @@ public class TestService {
 
         return savedTest.toDto();
     }
+
+//    Метод сделан без дополнительных проверок
     @Transactional
-    public TestDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
+    public TestPreviewDto create(TestDto testDto, Long folderId) {
+        final var user = userService.getCurrentUser();
+
+        final var trainingId = generateUniqueIdForField("uuid_training");
+
+        var test = Test.builder()
+                .name(testDto.getName())
+                .points(testDto.getPoints())
+                .creator(user)
+                .id(trainingId)
+                .uuidMonitoring(null)
+                .build();
+
+        test = testRepository.save(test);
+
+        for (final var questionDto : testDto.getQuestions()) {
+            var question = Question.builder()
+                    .question(questionDto.getQuestion())
+                    .type(questionDto.getType())
+                    .test(test)
+                    .points(questionDto.getPoints())
+                    .build();
+            question = questionRepository.save(question);
+
+            for (final var answerOptionsDto : questionDto.getAnswerOptions()) {
+                final var answerOption = AnswerOptions.builder()
+                        .option(answerOptionsDto.getOption())
+                        .isCorrect(answerOptionsDto.getIsCorrect())
+                        .question(question)
+                        .build();
+                answerOptionsRepository.save(answerOption);
+            }
+        }
+
+        Folder folder = null;
+        if (folderId != null)
+            folder = folderRepository.findByIdAndUser(folderId, user).orElse(null);
+        final var accessToTests = AccessToTests.builder().user(user).test(test).folder(folder).build();
+        accessToTestsRepository.save(accessToTests);
+
+        return TestPreviewDto.builder()
+                .id(test.getId())
+                .name(test.getName())
+                .points(test.getPoints())
+                .build();
+    }
+
+    @Transactional
+    public TestPreviewDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(assignTestToGroupDto.getTestId(), assignTestToGroupDto.getTestId())
@@ -122,7 +193,7 @@ public class TestService {
         Group group = groupRepository.findById(assignTestToGroupDto.getGroupId())
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-        if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, Role.ADMIN)) {
+        if (!userGroupRoleRepository.existsByGroupAndUserAndRole(group, currentUser, UserGroupRole.Role.ADMIN)) {
             throw new AccessDeniedException("Только администратор группы может добавлять тесты");
         }
 
@@ -144,7 +215,7 @@ public class TestService {
         return savedTest.toDto();
     }
     @Transactional
-    public TestDto addTestToFolder(String testId, Long folderId) {
+    public TestPreviewDto addTestToFolder(String testId, Long folderId) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(testId, testId)
@@ -188,13 +259,13 @@ public class TestService {
         return test.toDto();
     }
 
-    public List<TestDto> searchTests(String searchTerm) {
+    public List<TestPreviewDto> searchTests(String searchTerm) {
         List<Test> tests = testRepository.findByIdOrNameOrUuidMonitoring(searchTerm, searchTerm, searchTerm);
         return tests.stream().map(Test::toDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public TestDto moveTestBetweenFolders(String testId, Long sourceFolderId, Long targetFolderId) {
+    public TestPreviewDto moveTestBetweenFolders(String testId, Long sourceFolderId, Long targetFolderId) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(testId, testId)
@@ -262,7 +333,7 @@ public class TestService {
 
 //    TODO: Можно добавить более подходящие ошибки
 //    TODO: Добавить логику отслеживания количества попыток пользователя
-    public TestForTrainingResponse getTestForTraining(String id) {
+    public TestDto getTestForTraining(String id) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Не удалось найти заданный тест")
@@ -279,7 +350,7 @@ public class TestService {
                 .build();
         resultsRepository.save(results);
 
-        return TestForTrainingResponse.fromTest(test);
+        return TestDto.fromTest(test);
     }
 
 //    TODO: Прикрутить время прохождения теста (должно выполняться триггером)
@@ -391,5 +462,13 @@ public class TestService {
         } while (testRepository.existsByField(fieldName, generatedId));
 
         return generatedId;
+    }
+
+    public TestPreviewDto searchTrainingTest(String trainingId) {
+        final var test = testRepository.findById(trainingId).orElseThrow(
+                () -> new IllegalArgumentException("Заданного теста не существует")
+        );
+
+        return test.toDto();
     }
 }
