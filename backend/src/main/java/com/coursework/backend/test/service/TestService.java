@@ -326,7 +326,8 @@ public class TestService {
             if (!Objects.equals(currentQuestion.getTest().getId(), testForCheck.getId()))
                 throw new IllegalArgumentException("Вопрос не принадлежит данному тесту");
 
-            questionsPointsSum += currentQuestion.getPoints();
+            if (currentQuestion.getPoints() != null)
+                questionsPointsSum += currentQuestion.getPoints();
             switch (currentQuestion.getType()) {
                 case TEXT:
                     results.setStatus(Results.Status.AWAITING_APPROVAL);
@@ -368,7 +369,7 @@ public class TestService {
         resultsRepository.save(results);
     }
 
-//    TODO: Возможна ошибка при вычеслении баллов для checkbox ответов
+//    TODO: Возможна ошибка при вычислении баллов для checkbox ответов
     private static int getPointsForCheckboxAnswer(TestForCheck.QuestionForCheck questionForCheck, Set<Long> correctOptionIds, Question currentQuestion) {
         int tp = 0, fp = 0, tn = 0, fn = 0;
         for (final var userOptionId : questionForCheck.getCheckboxAnswersId()) {

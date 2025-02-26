@@ -235,7 +235,6 @@ const fetchTestsFromFolder = async (folderId) => {
             if (!response.ok) {
                 console.error('Ошибка при получении вопросов');
             }
-            console.log("aaaaaaaaa");
             const testData = await response.json();
             console.log(testData);
             navigate('/test-page', {
