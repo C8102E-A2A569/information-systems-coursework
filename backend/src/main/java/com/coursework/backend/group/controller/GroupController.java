@@ -55,4 +55,6 @@ public class GroupController {
     public List<GroupInListResponse> getMyGroups() {
         return groupService.getUserGroups();
     }
+
+
 }

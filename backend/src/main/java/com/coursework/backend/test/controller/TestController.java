@@ -78,4 +78,9 @@ public class TestController {
     public TestPreviewDto searchTrainingTest(@PathVariable String trainingId) {
         return testService.searchTrainingTest(trainingId);
     }
+
+    @GetMapping("/{groupId}/tests")
+    public List<GroupTestDto> getGroupTests(@PathVariable Long groupId) {
+        return testService.getGroupTests(groupId);
+    }
 }

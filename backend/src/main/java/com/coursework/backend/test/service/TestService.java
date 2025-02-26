@@ -56,6 +56,28 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<GroupTestDto> getGroupTests(Long groupId) {
+        final User currentUser = userService.getCurrentUser();
+        // Проверяем, состоит ли пользователь в группе
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+        if (!userGroupRoleRepository.existsByGroupAndUser(group, currentUser)) {
+            throw new AccessDeniedException("Пользователь не состоит в данной группе");
+        }
+        List<Test> tests = testRepository.findAllByGroup(group);
+
+        // Преобразуем тесты в GroupTestDto
+        return tests.stream()
+                .map(test -> GroupTestDto.builder()
+                        .id(test.getId())
+                        .name(test.getName())
+                        .points(test.getPoints())
+                        .mode(test.getUuidMonitoring() != null ? "monitoring" : "training")
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     @Deprecated
     @Transactional
     public TestPreviewDto createTest(CreateTestDto createTestDto) {
