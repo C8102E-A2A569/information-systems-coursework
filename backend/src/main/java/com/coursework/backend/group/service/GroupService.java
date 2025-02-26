@@ -36,16 +36,21 @@ public class GroupService {
 
     //список пользователей в группе
     public List<GroupUserDto> getUsersInGroup(Long groupId) {
+        final var user = userService.getCurrentUser();
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+        if (!userGroupRoleRepository.existsByGroupAndUser(group, user))
+            throw new IllegalArgumentException
+                    ("Пользователь не может получить список пользователей группы, поскольку он в ней не состоит");
 
-        return group.getUserGroupRoles().stream()
-                .map(userGroupRole -> new GroupUserDto(
-                        userGroupRole.getUser().getLogin(),
-                        userGroupRole.getUser().getName(),
-                        userGroupRole.getRole()
-                ))
-                .collect(Collectors.toList());
+        final var userGroupRoleList = userGroupRoleRepository.findAllByGroup(group);
+        return userGroupRoleList.stream().map(
+                (userGroupRole) -> GroupUserDto.builder()
+                        .name(userGroupRole.getUser().getName())
+                        .login(userGroupRole.getUser().getLogin())
+                        .role(userGroupRole.getRole())
+                        .build()
+        ).toList();
     }
 
     @Transactional

@@ -17,4 +17,5 @@ public interface UserGroupRoleRepository extends JpaRepository<UserGroupRole, Lo
     Optional<UserGroupRole> findByGroupAndUser(Group group, User user);
 
     List<UserGroupRole> findAllByUser(User user);
+    List<UserGroupRole> findAllByGroup(Group group);
 }
