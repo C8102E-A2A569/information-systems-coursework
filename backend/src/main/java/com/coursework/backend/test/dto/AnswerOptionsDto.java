@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnswerOptionsTrainingDto {
+public class AnswerOptionsDto {
     private Long id;
 
     private String option;
 
-    public static AnswerOptionsTrainingDto fromAnswerOptions(AnswerOptions options) {
-        return AnswerOptionsTrainingDto.builder()
+    public static AnswerOptionsDto fromAnswerOptions(AnswerOptions options) {
+        return AnswerOptionsDto.builder()
                 .id(options.getId())
                 .option(options.getOption())
                 .build();

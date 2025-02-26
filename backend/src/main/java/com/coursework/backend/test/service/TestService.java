@@ -37,7 +37,7 @@ public class TestService {
     private final AnswerOptionsRepository answerOptionsRepository;
     private final AnswersRepository answersRepository;
 
-    public List<TestDto> getRootTestsByUser() {
+    public List<TestPreviewDto> getRootTestsByUser() {
         final User user = userService.getCurrentUser();
         List<AccessToTests> accessToTests = accessToTestsRepository.findAllByUserAndFolder(user, null);
 
@@ -46,7 +46,7 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
-    public List<TestDto> getTestsByUserAndFolder(Long folderId) {
+    public List<TestPreviewDto> getTestsByUserAndFolder(Long folderId) {
         final User user = userService.getCurrentUser();
         final var folder = folderRepository.findByIdAndUser(folderId, user)
                 .orElseThrow(() -> new RuntimeException("Папка не найдена"));
@@ -56,8 +56,9 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     @Transactional
-    public TestDto createTest(CreateTestDto createTestDto) {
+    public TestPreviewDto createTest(CreateTestDto createTestDto) {
         final User currentUser = userService.getCurrentUser();
 
         Folder folder = null;
@@ -106,8 +107,23 @@ public class TestService {
 
         return savedTest.toDto();
     }
+
+    public CreateTestResponse create(TestDto testDto, Integer folderId) {
+        final var user = userService.getCurrentUser();
+
+        final var trainingId = generateUniqueIdForField("uuid_training");
+        final var monitoringId = generateUniqueIdForField("uuid_monitoring");
+
+        final var test = Test.builder()
+                .name(testDto.getName())
+                .points(testDto.getPoints())
+                .creator(user)
+                .id(trainingId)
+                .uuidMonitoring(monitoringId)
+    }
+
     @Transactional
-    public TestDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
+    public TestPreviewDto assignTestToGroup(AssignTestToGroupDto assignTestToGroupDto) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(assignTestToGroupDto.getTestId(), assignTestToGroupDto.getTestId())
@@ -142,7 +158,7 @@ public class TestService {
         return savedTest.toDto();
     }
     @Transactional
-    public TestDto addTestToFolder(String testId, Long folderId) {
+    public TestPreviewDto addTestToFolder(String testId, Long folderId) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(testId, testId)
@@ -186,13 +202,13 @@ public class TestService {
         return test.toDto();
     }
 
-    public List<TestDto> searchTests(String searchTerm) {
+    public List<TestPreviewDto> searchTests(String searchTerm) {
         List<Test> tests = testRepository.findByIdOrNameOrUuidMonitoring(searchTerm, searchTerm, searchTerm);
         return tests.stream().map(Test::toDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public TestDto moveTestBetweenFolders(String testId, Long sourceFolderId, Long targetFolderId) {
+    public TestPreviewDto moveTestBetweenFolders(String testId, Long sourceFolderId, Long targetFolderId) {
         final User currentUser = userService.getCurrentUser();
 
         Test test = testRepository.findByIdOrName(testId, testId)
@@ -260,7 +276,7 @@ public class TestService {
 
 //    TODO: Можно добавить более подходящие ошибки
 //    TODO: Добавить логику отслеживания количества попыток пользователя
-    public TestForTrainingResponse getTestForTraining(String id) {
+    public TestDto getTestForTraining(String id) {
         final var currentUser = userService.getCurrentUser();
         final var test = testRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Не удалось найти заданный тест")
@@ -277,7 +293,7 @@ public class TestService {
                 .build();
         resultsRepository.save(results);
 
-        return TestForTrainingResponse.fromTest(test);
+        return TestDto.fromTest(test);
     }
 
 //    TODO: Прикрутить время прохождения теста (должно выполняться триггером)
@@ -390,7 +406,7 @@ public class TestService {
         return generatedId;
     }
 
-    public TestDto searchTrainingTest(String trainingId) {
+    public TestPreviewDto searchTrainingTest(String trainingId) {
         final var test = testRepository.findById(trainingId).orElseThrow(
                 () -> new IllegalArgumentException("Заданного теста не существует")
         );
