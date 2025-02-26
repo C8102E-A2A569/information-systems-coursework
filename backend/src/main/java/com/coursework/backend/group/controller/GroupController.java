@@ -21,7 +21,7 @@ public class GroupController {
 
     private final GroupService groupService;
     @GetMapping("/{groupId}/users")
-    public Set<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
+    public List<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
         return groupService.getUsersInGroup(groupId);
     }
 
@@ -56,4 +56,3 @@ public class GroupController {
         return groupService.getUserGroups();
     }
 }
-
