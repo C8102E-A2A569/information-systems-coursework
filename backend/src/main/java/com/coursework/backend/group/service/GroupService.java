@@ -34,10 +34,14 @@ public class GroupService {
 
     //список пользователей в группе
     public Set<GroupUserDto> getUsersInGroup(Long groupId) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+        if (!groupRepository.existsById(groupId)) {
+            throw new GroupNotFoundException("Группа не найдена");
+        }
 
-        return group.getUserGroupRoles().stream()
+        // Directly query for UserGroupRole entries for this group
+        List<UserGroupRole> roles = userGroupRoleRepository.findAllByGroupId(groupId);
+
+        return roles.stream()
                 .map(userGroupRole -> new GroupUserDto(
                         userGroupRole.getUser().getLogin(),
                         userGroupRole.getUser().getName()
@@ -46,35 +50,57 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupDto createGroup(CreateGroupDto createGroupDto, String userLogin) {
+    public GroupDto createGroup(CreateGroupDto createGroupDto) {
         // Создаем новую группу
         Group group = new Group();
         group.setName(createGroupDto.getName());
         group = groupRepository.save(group);
 
-        User user = userRepository.findByLogin(userLogin)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User currentUser = userService.getCurrentUser();
 
         // Создание UserGroupRole с правильно установленным составным ключом
         UserGroupRole userGroupRole = new UserGroupRole();
 //        UserGroupRoleId userGroupRoleId = new UserGroupRoleId(group.getId(), user.getLogin());
-        final var userGroupRoleId = UserGroupRole.UserGroupRoleId.builder().groupId(group.getId()).userLogin(user.getLogin()).build();
+        final var userGroupRoleId = UserGroupRole.UserGroupRoleId.builder()
+                .groupId(group.getId())
+                .userLogin(currentUser.getLogin())
+                .build();
         userGroupRole.setId(userGroupRoleId);  // Устанавливаем составной ключ
         userGroupRole.setGroup(group);
-        userGroupRole.setUser(user);
+        userGroupRole.setUser(currentUser);
         userGroupRole.setRole(UserGroupRole.Role.ADMIN);
-
         userGroupRoleRepository.save(userGroupRole);
+
+        // Добавление пользователей из списка logins
+        for (String login : createGroupDto.getLogins()) {
+            User user = userRepository.findByLogin(login)
+                    .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+            if (!userGroupRoleRepository.existsByGroupAndUser(group, user)) {
+                final var newUserGroupRoleId = UserGroupRole.UserGroupRoleId.builder()
+                        .groupId(group.getId())
+                        .userLogin(user.getLogin())
+                        .build();
+                UserGroupRole newUserGroupRole = new UserGroupRole();
+                newUserGroupRole.setId(newUserGroupRoleId);
+                newUserGroupRole.setGroup(group);
+                newUserGroupRole.setUser(user);
+                newUserGroupRole.setRole(UserGroupRole.Role.USER);
+                userGroupRoleRepository.save(newUserGroupRole);
+            }
+        }
 
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
 
     @Transactional
-    public GroupDto updateGroupName(Long groupId, PatchGroupDto patchGroupDto, String adminLogin) {
+    public GroupDto updateGroupName(Long groupId, PatchGroupDto patchGroupDto) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-        if (!isAdmin(group, adminLogin)) {
+        User currentUser = userService.getCurrentUser();
+
+        if (!isAdmin(group, currentUser.getLogin())) {
             throw new AccessDeniedException("Недостаточно прав для изменения названия группы");
         }
 
@@ -85,11 +111,13 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupDto addUserToGroup(Long groupId, String userLogin, String adminLogin) {
+    public GroupDto addUserToGroup(Long groupId, String userLogin) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-        if (!isAdmin(group, adminLogin)) {
+        User currentUser = userService.getCurrentUser();
+
+        if (!isAdmin(group, currentUser.getLogin())) {
             throw new AccessDeniedException("Недостаточно прав для добавления пользователя в группу");
         }
 
@@ -103,7 +131,9 @@ public class GroupService {
 
         // Создание новой связи с составным ключом
         final var userGroupRoleId = UserGroupRole.UserGroupRoleId.builder()
-                .groupId(group.getId()).groupId(group.getId()).build();
+                .groupId(group.getId())
+                .userLogin(user.getLogin())
+                .build();
         UserGroupRole userGroupRole = new UserGroupRole();
         userGroupRole.setId(userGroupRoleId);  // Устанавливаем составной ключ
         userGroupRole.setGroup(group);
@@ -114,20 +144,19 @@ public class GroupService {
         return new GroupDto(group.getId(), group.getName(), getUsersWithRoles(group));
     }
     @Transactional
-    public GroupDto removeUserFromGroup(Long groupId, String userLogin, String adminLogin) {
+    public GroupDto removeUserFromGroup(Long groupId, String userLogin) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
 
-        if (!isAdmin(group, adminLogin)) {
+        User currentUser = userService.getCurrentUser();
+
+        if (!isAdmin(group, currentUser.getLogin())) {
             throw new AccessDeniedException("Недостаточно прав для удаления пользователя из группы");
         }
 
         User user = userRepository.findByLogin(userLogin)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 
-        // Создание UserGroupRoleId для поиска связи с составным ключом
-        final var userGroupRoleId = UserGroupRole.UserGroupRoleId.builder()
-                .groupId(group.getId()).groupId(group.getId()).build();
         UserGroupRole userGroupRole = userGroupRoleRepository.findByGroupAndUser(group, user)
                 .orElseThrow(() -> new UserNotInGroupException("Пользователь не состоит в группе"));
 
@@ -137,11 +166,12 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(Long groupId, String adminLogin) {
+    public void deleteGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException("Группа не найдена"));
+        User currentUser = userService.getCurrentUser();
 
-        if (!isAdmin(group, adminLogin)) {
+        if (!isAdmin(group, currentUser.getLogin())) {
             throw new AccessDeniedException("Недостаточно прав для удаления группы");
         }
 

@@ -20,42 +20,36 @@ import java.util.Set;
 public class GroupController {
 
     private final GroupService groupService;
-
-    //нужно добавить все группы, в которых состоит пользователь
-
     @GetMapping("/{groupId}/users")
     public Set<GroupUserDto> getUsersInGroup(@PathVariable Long groupId) {
         return groupService.getUsersInGroup(groupId);
     }
 
-    @PostMapping
-    public GroupDto createGroup(@RequestParam String userLogin, @RequestBody @Valid CreateGroupDto dto) {
-        return groupService.createGroup(dto, userLogin);
+    @PostMapping("/create")
+    public GroupDto createGroup(@RequestBody @Valid CreateGroupDto createGroupDto) {
+        return groupService.createGroup(createGroupDto);
     }
 
     @PatchMapping("/{groupId}/update-name")
     public GroupDto updateGroupName(@PathVariable Long groupId,
-                                    @RequestParam String adminLogin,
                                     @RequestBody @Valid PatchGroupDto patchGroupDto) {
-        return groupService.updateGroupName(groupId, patchGroupDto, adminLogin);
+        return groupService.updateGroupName(groupId, patchGroupDto);
     }
 
-    @DeleteMapping("/delete/{groupId}/users/{userLogin}/admin/{adminLogin}")
-    public void deleteGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
-        groupService.deleteGroup(groupId, adminLogin);
+    @DeleteMapping("/delete/{groupId}")
+    public void deleteGroup(@PathVariable Long groupId) {
+        groupService.deleteGroup(groupId);
     }
 
-    @PostMapping("/add-user/{groupId}/users/{userLogin}/admin/{adminLogin}")
-    public void addUserToGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
-        groupService.addUserToGroup(groupId, userLogin, adminLogin);
+    @PostMapping("/add-user/{groupId}/users/{userLogin}")
+    public GroupDto addUserToGroup(@PathVariable Long groupId, @PathVariable String userLogin) {
+        return groupService.addUserToGroup(groupId, userLogin);
     }
 
-    @DeleteMapping("/remove-user/{groupId}/users/{userLogin}/admin/{adminLogin}")
-    public void removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin, @PathVariable String adminLogin) {
-        groupService.removeUserFromGroup(groupId, userLogin, adminLogin);
+    @DeleteMapping("/remove-user/{groupId}/users/{userLogin}")
+    public GroupDto removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userLogin) {
+        return groupService.removeUserFromGroup(groupId, userLogin);
     }
-
-
 
     @GetMapping("/my")
     public List<GroupInListResponse> getMyGroups() {
