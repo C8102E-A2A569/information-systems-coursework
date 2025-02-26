@@ -150,8 +150,9 @@
 }
 
 .addFolder {
-    font-size: 33px;
+    font-size: 24px;
     color: #eed7fd;
+    margin-top: 5px;
     margin-right: 15px;
 }
 
@@ -288,4 +289,107 @@
     box-shadow: 0 0 2px black;
 }
 
+.createTestButton {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 300px;
+    color: #f1eac7;
+    font-size: 18px;
+    margin-top: 7px;
+    border: 1px solid black;
+    box-shadow: 0 1px 2px black;
+    border-radius: 5px;
+    background-color: #ac00e5;
+    justify-content: center;
+    width: 150px;
+    padding: 3px;
+}
+.createTest {
+    margin-left: 7px;
+}
+.createTestButton:hover {
+    box-shadow: 0 2px 3px black;
+    background-color: #b700f6;
+}
+
+.create-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-modal-content {
+    background-color: #66ff61;
+    padding: 20px;
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px black;
+    width: 300px;
+    text-align: left;
+    color: #00023a;
+    font-size: 15px;
+}
+
+.close-create-modal{
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #00023a;
+    position: fixed;
+    margin-left: 290px;
+    margin-top: -70px;
+}
+
+.create-modal h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.create-modal input[type="text"] {
+    width: 70%;
+    color: #00023a;
+    background-color: #efff74;
+    border: 1px solid #00023a;
+    outline: none;
+}
+.create-modal input[type="text"]:hover {
+    box-shadow: 0 1px 2px #00023a;
+}
+
+.create-modal .ok {
+    width: 60px;
+    height: 30px;
+    text-align: center;
+    margin: 23px 120px 5px;
+    border: 1px solid black;
+    border-radius: 15px;
+    background-color: #e59dff;
+    font-size: 16px;
+    box-shadow: 0 1px 3px #00023a;
+}
+.create-modal .ok:hover {
+    box-shadow: 0 2px 3px #00023a;
+}
+.create-modal .points {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    text-align: center;
+    margin-top: 20px;
+}
+.create-modal .withPoints {
+    margin-left: -12px;
+}
+.create-modal input[type="checkbox"]{
+    position: fixed;
+    margin-left: -187px;
+}
 /* background: rgba(15, 230, 172, 0.8); */

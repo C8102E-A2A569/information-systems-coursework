@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './MainPage.css';
 import {faFolderClosed} from "@fortawesome/free-solid-svg-icons";
+import {faPlus} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
@@ -20,6 +21,9 @@ const MainPage = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [searchId, setSearchId] = useState('');
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [testTitle, setTestTitle] = useState('');
+    const [withPoints, setWithPoints] = useState(false);
 
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -73,6 +77,7 @@ const MainPage = () => {
             const data = await response.json();
             console.log('Полученные данные:', data)
             setTests(data);
+            console.log(data);
         } catch (error) {
             console.log('Ошибка при загрузке тестов');
         }
@@ -176,6 +181,22 @@ const fetchTestsFromFolder = async (folderId) => {
         setIsSearchModalOpen(false);
         setSearchId('');
     };
+    const createTestClick = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const closeCreateTestModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
+    const handleCreateClick = () =>{
+        navigate('/create-test', {
+            state: {
+                title: testTitle,
+                points: withPoints
+            }
+        })
+    }
 
     const handleSearch = () => {
         // Здесь будет логика для поиска по ID
@@ -214,9 +235,10 @@ const fetchTestsFromFolder = async (folderId) => {
     };
 
     const handleOutsideClick = (e) => {
-        if (e.target.className !== 'modal') return;
+        if (e.target.className !== 'modal' && e.target.className !== 'create-modal') return;
         closeModal();
         closeSearchModal();
+        closeCreateTestModal();
     };
     const handleStartTest = async (testId) => {
         try {
@@ -251,6 +273,7 @@ const fetchTestsFromFolder = async (folderId) => {
             console.error('Ошибка при загрузке данных теста:', error);
         }
     };
+
 
     useEffect(() => {
         const loadFolderData = async () => {
@@ -288,7 +311,7 @@ const fetchTestsFromFolder = async (folderId) => {
                     </KeyboardBackspaceIcon>
                 )}
                     <div className="placeholder"></div>
-                    <div className="addFolder" onClick={openModal}>+</div>
+                    <div className="addFolder" onClick={openModal}><FontAwesomeIcon icon={faPlus}/></div>
                 </div>
                 {folders && folders.length > 0 ? (
                     folders.map((folder, index) => (
@@ -308,6 +331,10 @@ const fetchTestsFromFolder = async (folderId) => {
 
             {currentPath.length > 0 && (
                 <div className="tests">
+                    <div className="createTestButton" onClick={createTestClick}>
+                        <FontAwesomeIcon icon={faPlus}/>
+                        <div className="createTest">Создать тест</div>
+                    </div>
                     {folderTests && folderTests.length > 0 ? (
                         folderTests.map((test, index) => (
                             <div className="test" key={index}>
@@ -324,6 +351,10 @@ const fetchTestsFromFolder = async (folderId) => {
 
             {currentPath.length === 0 && tests.length >= 0 && (
                     <div className="tests">
+                        <div className="createTestButton" onClick={createTestClick}>
+                            <FontAwesomeIcon icon={faPlus}/>
+                            <div className="createTest">Создать тест</div>
+                        </div>
                         {tests && tests.length > 0 ? (
                             tests.map((test, index) => (
                                 <div className="test" key={index}>
@@ -371,6 +402,33 @@ const fetchTestsFromFolder = async (folderId) => {
                             placeholder="Введите id"
                         />
                         <button className="search-button" onClick={handleSearch}>Найти</button>
+                    </div>
+                </div>
+            )}
+
+
+            {isCreateModalOpen && (
+                <div className="create-modal" >
+                    <div className="create-modal-content" >
+                        <h2>Создать тест</h2>
+                        <button onClick={closeCreateTestModal} className="close-create-modal">✖</button>
+                        <label>
+                            Название теста:
+                            <input
+                                type="text"
+                                value={testTitle}
+                                onChange={(e) => setTestTitle(e.target.value)}
+                            />
+                        </label>
+                        <label className="points">
+                            <input
+                                type="checkbox"
+                                checked={withPoints}
+                                onChange={() => setWithPoints(!withPoints)}
+                            />
+                            <div className="withPoints">С баллами</div>
+                        </label>
+                        <button className="ok" onClick={handleCreateClick}>Oк</button>
                     </div>
                 </div>
             )}
