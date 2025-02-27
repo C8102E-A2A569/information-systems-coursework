@@ -198,11 +198,46 @@ const fetchTestsFromFolder = async (folderId) => {
         })
     }
 
-    const handleSearch = () => {
-        // Здесь будет логика для поиска по ID
-        console.log('Идет поиск теста с ID:', searchId);
-        // Реализация поиска...
-        closeSearchModal(); // Закрываем модальное окно после поиска
+    const handleSearch = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Токен не найден');
+                return;
+            }
+    
+            const response = await fetch(`http://localhost:8080/tests/${searchId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Тест не найден');
+            }
+    
+            const testData = await response.json();
+            console.log('Найденный тест:', testData);
+    
+            // Здесь можно добавить логику для отображения найденного теста
+            navigate('/test-page', {
+                state: {
+                    testInfo: {
+                        id: testData.id,
+                        name: testData.name,
+                        points: testData.points
+                    },
+                    questions: testData.questions
+                }
+            });
+    
+            closeSearchModal();
+        } catch (error) {
+            console.error('Ошибка при поиске теста:', error.message);
+            setErrorMessage('Тест не найден');
+        }
     };
 
     const handleCreateFolder = async () => {
@@ -278,6 +313,7 @@ const fetchTestsFromFolder = async (folderId) => {
     useEffect(() => {
         const loadFolderData = async () => {
             try {
+                await fetchFolders();
                 if (currentPath.length === 0) {
                     await fetchFolders();
                     await fetchTests();
@@ -434,4 +470,4 @@ const fetchTestsFromFolder = async (folderId) => {
             )}
         </div>
     )};
-    export default MainPage;
+export default MainPage;

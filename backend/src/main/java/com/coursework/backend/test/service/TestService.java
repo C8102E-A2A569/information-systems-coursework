@@ -56,6 +56,20 @@ public class TestService {
                 .collect(Collectors.toList());
     }
 
+    public TestDto getTestById(String testId) {
+        final User currentUser = userService.getCurrentUser();
+
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new TestNotFoundException("Тест не найден"));
+
+        // Проверка доступа пользователя к тесту
+        if (!accessToTestsRepository.existsByUserAndTest(currentUser, test)) {
+            throw new AccessDeniedException("Пользователь не имеет доступа к данному тесту");
+        }
+
+        return TestDto.fromTest(test);
+    }
+
     @Transactional(readOnly = true)
     public List<GroupTestDto> getGroupTests(Long groupId) {
         final User currentUser = userService.getCurrentUser();

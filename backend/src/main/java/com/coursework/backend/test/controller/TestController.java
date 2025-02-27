@@ -14,8 +14,10 @@ import java.util.List;
 public class TestController {
 
     private final TestService testService;
-
-    //получить список всех тестов пользователя в корневой папке автоматически при входе на сайт
+    @GetMapping("/{testId}")
+    public TestDto getTestById(@PathVariable String testId) {
+        return testService.getTestById(testId);
+    }
     @GetMapping("/user")
     public List<TestPreviewDto> getTestsByUser() {
         return testService.getRootTestsByUser();
@@ -83,4 +85,5 @@ public class TestController {
     public List<GroupTestDto> getGroupTests(@PathVariable Long groupId) {
         return testService.getGroupTests(groupId);
     }
+
 }
