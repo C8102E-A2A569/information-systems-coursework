@@ -42,7 +42,7 @@ const UserProfile = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/user/${username}`, {
+            const response = await fetch(`http://localhost:8080/user/profile`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${token}`,

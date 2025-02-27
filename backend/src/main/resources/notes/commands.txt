@@ -48,9 +48,9 @@ curl --location 'http://localhost:8080/groups/my' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIyIiwic3ViIjoidXNlcjIiLCJpYXQiOjE3NDA2MDIyNDgsImV4cCI6MTc0MDc0NjI0OH0.7TYBDAva-ELmHG9qeZOUfLP_nob_ZhoCowLEMY1oYg4'
 
 // UPDATE USER
-curl --location --request PATCH 'http://localhost:8080/user/user1' \
+curl --location --request PATCH 'http://localhost:8080/user/profile' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3MzkxOTk5MjYsImV4cCI6MTczOTM0MzkyNn0.l9K_h0j5NFkQZiHmL5FF4Ga9pjq84fONn8juSQRP6qY' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIxIiwic3ViIjoidXNlcjEiLCJpYXQiOjE3NDA2NTI1MzYsImV4cCI6MTc0MDc5NjUzNn0.fxyZNIDj0G2xzKk2EvxFqhpLiB_QDKkA3V9DeF-V2Mo' \
 --data '{
     "name": "AlinaRom"
 }'

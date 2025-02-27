@@ -1,5 +1,6 @@
 package com.coursework.backend.user.service;
 
+import com.coursework.backend.exception.exceptions.AccessDeniedException;
 import com.coursework.backend.exception.exceptions.UserAlreadyExistsException;
 import com.coursework.backend.exception.exceptions.UserNotFoundException;
 import com.coursework.backend.security.JwtService;
@@ -36,6 +37,10 @@ public class UserService {
     @Transactional
     public AuthResponseDto patchUser(PatchUserDto patchUserDto) {
         User user = getCurrentUser();
+
+        if (patchUserDto.getLogin() != null && !patchUserDto.getLogin().equals(user.getLogin())) {
+            throw new AccessDeniedException("Изменение логина запрещено");
+        }
 
         if (patchUserDto.getName() != null && !patchUserDto.getName().isBlank()) {
             user.setName(patchUserDto.getName());
