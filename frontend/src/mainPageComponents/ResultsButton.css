@@ -1,0 +1,110 @@
+.results-section {
+    z-index: 1000;
+    left: 500px;
+    top: 100px;
+    background-color: #dda1ff;
+    border: 2px solid black;
+    border-radius: 10px;
+    color: #00023a;
+    overflow-y: auto;
+    position: fixed;
+}
+
+.my-results {
+    margin-top: 0;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.my-results:disabled {
+    background: #a5d6a7;
+    cursor: wait;
+}
+
+.results-list {
+    margin-top: 15px;
+    padding-top: 10px;
+    width: 500px;
+    height: 500px;
+}
+
+.result-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.result-item:hover {
+    transform: translateX(5px);
+    background: #e9ecef;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.status {
+    font-size: 0.9em;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.status.awaiting_approval {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status.approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.result-details {
+    display: flex;
+    color: #666;
+}
+
+.results-list .error-message {
+    color: #dc3545;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8d7da;
+    border-radius: 4px;
+}
+
+
+.results-section::-webkit-scrollbar {
+    width: 0;
+}
+
+
+.close-button {
+    margin-top: 10px;
+    margin-right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: black;
+}
+
+.close-button:hover {
+    color: #430000;
+}
