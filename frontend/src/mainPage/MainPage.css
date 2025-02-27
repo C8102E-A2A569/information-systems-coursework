@@ -257,6 +257,25 @@
     padding-right: 5px;
 }
 
+.my-results {
+    position: fixed;
+    top: 20px;
+    right: 320px;
+    height: 32px;
+    width: 130px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-family: "Calibri", sans-serif;
+    background-color: #a6e8ff;
+    color: #000131;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.my-results .icon {
+    padding-right: 5px;
+}
+
 .modal .search-modal {
     border: 1px solid black;
     border-radius: 8px;

@@ -8,7 +8,9 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import UserProfile from "../mainPageComponents/UserProfile";
 import Groups from "../mainPageComponents/Groups";
 import {useNavigate} from "react-router-dom";
+import ResultsButton from "../mainPageComponents/ResultsButton";
 import groups from "../mainPageComponents/Groups";
+import {faClipboardCheck} from "@fortawesome/free-solid-svg-icons/faClipboardCheck";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -362,6 +364,7 @@ const MainPage = () => {
             <button className="search" onClick={openSearchModal}>
                 <FontAwesomeIcon icon={faSearch} className="icon"/> Найти тест
             </button>
+            <ResultsButton></ResultsButton>
             <UserProfile></UserProfile>
             <ul className="folders">
                 <div className="header">
