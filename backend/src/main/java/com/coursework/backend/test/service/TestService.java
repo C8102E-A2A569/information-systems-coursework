@@ -151,6 +151,8 @@ public class TestService {
 
         final var trainingId = generateUniqueIdForField("uuid_training");
 
+        if (testDto.getName() == null || testDto.getName().isBlank())
+            throw new IllegalArgumentException("Название теста не должно быть пустым");
         var test = Test.builder()
                 .name(testDto.getName())
                 .points(testDto.getPoints())
@@ -162,6 +164,10 @@ public class TestService {
         test = testRepository.save(test);
 
         for (final var questionDto : testDto.getQuestions()) {
+            if (questionDto.getQuestion() == null || questionDto.getQuestion().isBlank())
+                throw new IllegalArgumentException("Вопрос не может быть пустым");
+            if (questionDto.getType() == null)
+                throw new IllegalArgumentException("Тип вопроса должен быть указан");
             var question = Question.builder()
                     .question(questionDto.getQuestion())
                     .type(questionDto.getType())
@@ -171,12 +177,19 @@ public class TestService {
             question = questionRepository.save(question);
 
             for (final var answerOptionsDto : questionDto.getAnswerOptions()) {
+                if (answerOptionsDto.getOption() == null || answerOptionsDto.getOption().isBlank())
+                    throw  new IllegalArgumentException("Вариант ответа не может быть пустым");
                 final var answerOption = AnswerOptions.builder()
                         .option(answerOptionsDto.getOption())
                         .isCorrect(answerOptionsDto.getIsCorrect())
                         .question(question)
                         .build();
                 answerOptionsRepository.save(answerOption);
+            }
+            if (question.getType() != Question.Type.TEXT) {
+                if (questionDto.getAnswerOptions().stream().filter(AnswerOptionsDto::getIsCorrect).toList().isEmpty()) {
+                    throw new IllegalArgumentException("У вопроса с выбором варианта ответа должен быть хотя бы один правильный ответ");
+                }
             }
         }
 
