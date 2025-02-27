@@ -7,7 +7,7 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 const CreateTestPage = () => {
     const location = useLocation();
-    const {title: initialTitle, points} = location.state || {};
+    const {title: initialTitle, points, folderId} = location.state || {};
     const [title, setTitle] = useState(initialTitle || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [questionType, setQuestionType] = useState('TEXT');
@@ -108,8 +108,10 @@ const CreateTestPage = () => {
             })),
         };
 
+        const folderIdUrl = folderId != null ? '?folderId=' + folderId : '';
+
         try {
-            const response = await fetch('http://localhost:8080/tests/create/new', {
+            const response = await fetch(`http://localhost:8080/tests/create/new${folderIdUrl}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

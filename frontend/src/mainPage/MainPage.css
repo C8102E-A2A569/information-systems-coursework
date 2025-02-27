@@ -47,19 +47,10 @@
 .folders .folder {
     background-color: #c573fb;
     border-radius: 8px;
-    padding: 10px 10px;
+    padding: 5px 10px;
     margin: 10px 20px;
     font-size: 20px;
     text-align: center;
-}
-
-
-.folders h2 {
-    margin-left: 114px;
-    margin-top: 15px;
-    color: #f6f4ee; 
-    font-size: 24px; 
-    font-family: "Calibri", sans-serif; 
 }
 
 .folders .folderIcon {
@@ -401,4 +392,49 @@
     position: fixed;
     margin-left: -187px;
 }
+
+
+
+.start-test-button {
+    border: 1px solid black;
+    box-shadow: 0 1px 2px black;
+    border-radius: 7px;
+    width: 105px !important;
+    height: 32px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #3b49ff;
+    color: #fcffce !important;
+    font-size: 15px;
+    font-family: "Candara", sans-serif;
+    margin-left: 15px;
+}
+
+.search-result .error-message {
+    color: #822929;
+    padding: 10px;
+    margin-top: -20px;
+    margin-left: 75px;
+}
+
+.retry-button {
+    background: #ff0025 !important;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close-result-button {
+    margin-top: 10px;
+    background: #cc192f !important;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    width: 105px !important;
+    height: 34px !important;
+    font-size: 15px !important;
+    margin-left: 50px !important;
+}
+
 /* background: rgba(15, 230, 172, 0.8); */

@@ -24,7 +24,7 @@ const MainPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [testTitle, setTestTitle] = useState('');
     const [withPoints, setWithPoints] = useState(false);
-    const [groups, setGroups] = useState([]);
+    const [foundTest, setFoundTest] = useState(null);
 
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -87,43 +87,43 @@ const MainPage = () => {
 
     const fetchSubfolders = async (folderId) => {
         const subFoldersResponse = await fetch('http://localhost:8080/folders/subfolders', {
-        method: 'POST',
-            headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-        },
-            body: JSON.stringify({ id: folderId }),
-    });
-    if (!subFoldersResponse.ok) {
-        throw new Error('Ошибка при получении дочерних папок');
-    }
-        // setSubFolders(subFoldersData);
-        return await subFoldersResponse.json();
-}
-const fetchTestsFromFolder = async (folderId) => {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Токен не найден');
-            return [];
-        }
-        const folderTestsResponse = await fetch('http://localhost:8080/tests/folder', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({folderId: folderId}),
+            body: JSON.stringify({ id: folderId }),
         });
-        if (!folderTestsResponse.ok) {
-            throw new Error('Ошибка при получении тестов папки');
+        if (!subFoldersResponse.ok) {
+            throw new Error('Ошибка при получении дочерних папок');
         }
-        return await folderTestsResponse.json();
-        //setFolderTests(folderTestsData);
-    } catch (error){
-        return [];
+        // setSubFolders(subFoldersData);
+        return await subFoldersResponse.json();
     }
-}
+    const fetchTestsFromFolder = async (folderId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Токен не найден');
+                return [];
+            }
+            const folderTestsResponse = await fetch('http://localhost:8080/tests/folder', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({folderId: folderId}),
+            });
+            if (!folderTestsResponse.ok) {
+                throw new Error('Ошибка при получении тестов папки');
+            }
+            return await folderTestsResponse.json();
+            //setFolderTests(folderTestsData);
+        } catch (error){
+            return [];
+        }
+    }
 
 
     const handleFolderClick = async (folderId) => {
@@ -191,12 +191,17 @@ const fetchTestsFromFolder = async (folderId) => {
     };
 
     const handleCreateClick = () =>{
+        const currentFolderId = currentPath.length > 0
+            ? currentPath[currentPath.length - 1]
+            : null;
+
         navigate('/create-test', {
             state: {
                 title: testTitle,
-                points: withPoints
+                points: withPoints,
+                folderId: currentFolderId
             }
-        })
+        });
     }
 
     const handleSearch = async () => {
@@ -206,7 +211,7 @@ const fetchTestsFromFolder = async (folderId) => {
                 console.error('Токен не найден');
                 return;
             }
-    
+
             const response = await fetch(`http://localhost:8080/tests/${searchId}`, {
                 method: 'GET',
                 headers: {
@@ -214,31 +219,35 @@ const fetchTestsFromFolder = async (folderId) => {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error('Тест не найден');
             }
-    
+
             const testData = await response.json();
             console.log('Найденный тест:', testData);
-    
-            // Здесь можно добавить логику для отображения найденного теста
-            navigate('/test-page', {
-                state: {
-                    testInfo: {
-                        id: testData.id,
-                        name: testData.name,
-                        points: testData.points
-                    },
-                    questions: testData.questions
-                }
-            });
-    
-            closeSearchModal();
+            setFoundTest(testData);
+            setErrorMessage('');
+
         } catch (error) {
             console.error('Ошибка при поиске теста:', error.message);
+            setFoundTest(null);
             setErrorMessage('Тест не найден');
         }
+        // Здесь можно добавить логику для отображения найденного теста
+        // navigate('/test-page', {
+        //     state: {
+        //         testInfo: {
+        //             id: testData.id,
+        //             name: testData.name,
+        //             points: testData.points
+        //         },
+        //         questions: testData.questions
+        //     }
+        // });
+        //
+        // closeSearchModal();
+
     };
 
     const handleCreateFolder = async () => {
@@ -309,39 +318,12 @@ const fetchTestsFromFolder = async (folderId) => {
             console.error('Ошибка при загрузке данных теста:', error);
         }
     };
-        // Метод для загрузки групп пользователя
-        const fetchUserGroups = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    console.error('Токен не найден');
-                    return;
-                }
-    
-                const response = await fetch('http://localhost:8080/groups/my', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-    
-                if (!response.ok) {
-                    throw new Error('Ошибка при получении групп');
-                }
-    
-                const data = await response.json();
-                setGroups(data);
-            } catch (error) {
-                console.error('Ошибка при загрузке групп:', error.message);
-            }
-        };
 
 
     useEffect(() => {
         const loadFolderData = async () => {
             try {
-                await fetchFolders();
+                //  await fetchFolders();
                 if (currentPath.length === 0) {
                     await fetchFolders();
                     await fetchTests();
@@ -351,8 +333,6 @@ const fetchTestsFromFolder = async (folderId) => {
                     await fetchSubfolders(parentFolderId);
                     await fetchTestsFromFolder(parentFolderId);
                 }
-                // Загрузка групп пользователя
-                await fetchUserGroups();
             } catch (error) {
                 console.error('Ошибка при загрузке данных:', error.message);
             }
@@ -370,13 +350,12 @@ const fetchTestsFromFolder = async (folderId) => {
             <UserProfile></UserProfile>
             <ul className="folders">
                 <div className="header">
-                <h2>Мои папки</h2>
-                {currentPath.length > 0 && (
-                    <KeyboardBackspaceIcon className="back"
-                                           onClick={() => handleBack(currentPath[currentPath.length - 1])}
-                                           style={{ fontSize: '32px' }}>
-                    </KeyboardBackspaceIcon>
-                )}
+                    {currentPath.length > 0 && (
+                        <KeyboardBackspaceIcon className="back"
+                                               onClick={() => handleBack(currentPath[currentPath.length - 1])}
+                                               style={{ fontSize: '32px' }}>
+                        </KeyboardBackspaceIcon>
+                    )}
                     <div className="placeholder"></div>
                     <div className="addFolder" onClick={openModal}><FontAwesomeIcon icon={faPlus}/></div>
                 </div>
@@ -417,26 +396,26 @@ const fetchTestsFromFolder = async (folderId) => {
             )}
 
             {currentPath.length === 0 && tests.length >= 0 && (
-                    <div className="tests">
-                        <div className="createTestButton" onClick={createTestClick}>
-                            <FontAwesomeIcon icon={faPlus}/>
-                            <div className="createTest">Создать тест</div>
-                        </div>
-                        {tests && tests.length > 0 ? (
-                            tests.map((test, index) => (
-                                <div className="test" key={index}>
-                                    {test.name} ({test.points} баллов)
-                                    <br/>
-                                    <button className="start" onClick={() => handleStartTest(test.id)}>Пройти</button>
-                                </div>
-                            ))
-                        ) : (
-                            <p></p>
-                        )}
+                <div className="tests">
+                    <div className="createTestButton" onClick={createTestClick}>
+                        <FontAwesomeIcon icon={faPlus}/>
+                        <div className="createTest">Создать тест</div>
                     </div>
-                )}
+                    {tests && tests.length > 0 ? (
+                        tests.map((test, index) => (
+                            <div className="test" key={index}>
+                                {test.name} ({test.points} баллов)
+                                <br/>
+                                <button className="start" onClick={() => handleStartTest(test.id)}>Пройти</button>
+                            </div>
+                        ))
+                    ) : (
+                        <p></p>
+                    )}
+                </div>
+            )}
 
-            <Groups groups={groups}></Groups>
+            <Groups></Groups>
 
             {isModalOpen && (
                 <div className="modal">
@@ -462,13 +441,66 @@ const fetchTestsFromFolder = async (folderId) => {
             {isSearchModalOpen && (
                 <div className="modal">
                     <div className="search-modal">
-                        <input
-                            type="text"
-                            value={searchId}
-                            onChange={(e) => setSearchId(e.target.value)}
-                            placeholder="Введите id"
-                        />
-                        <button className="search-button" onClick={handleSearch}>Найти</button>
+                        {/*<input*/}
+                        {/*    type="text"*/}
+                        {/*    value={searchId}*/}
+                        {/*    onChange={(e) => setSearchId(e.target.value)}*/}
+                        {/*    placeholder="Введите id"*/}
+                        {/*/>*/}
+                        {/*<button className="search-button" onClick={handleSearch}>Найти</button>*/}
+                        {!foundTest && !errorMessage && (
+                            <>
+                                <input
+                                    type="text"
+                                    value={searchId}
+                                    onChange={(e) => setSearchId(e.target.value)}
+                                    placeholder="Введите id теста"
+                                />
+                                <button className="search-button" onClick={handleSearch}>
+                                    Найти
+                                </button>
+                            </>
+                        )}
+
+                        {errorMessage && (
+                            <div className="search-result">
+                                <div className="error-message">{errorMessage}</div>
+                                <button
+                                    className="retry-button"
+                                    onClick={() => setErrorMessage('')}
+                                >
+                                    Попробовать снова
+                                </button>
+                            </div>
+                        )}
+                        {foundTest && (
+                            <div className="search-result">
+                                <div className="found-test">
+                                    <h3>{foundTest.name}</h3>
+                                    <div className="test-points">
+                                        Баллов: {foundTest.points}
+                                    </div>
+                                    <button
+                                        className="start-test-button"
+                                        onClick={() => {
+                                            handleStartTest(foundTest.id);
+                                            closeSearchModal();
+                                        }}
+                                    >
+                                        Пройти тест
+                                    </button>
+                                    <button
+                                        className="close-result-button"
+                                        onClick={() => {
+                                            setFoundTest(null);
+                                            setErrorMessage('');
+                                        }}
+                                    >
+                                        Закрыть
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
