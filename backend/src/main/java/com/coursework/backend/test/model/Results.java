@@ -1,5 +1,6 @@
 package com.coursework.backend.test.model;
 
+import com.coursework.backend.group.model.Group;
 import com.coursework.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,13 @@ public class Results {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(name = "repetitions_count", nullable = false)
+    private Long repetitionsCount;
+
+    @OneToOne
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    private Group group;
 
     @OneToMany(mappedBy = "results", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Answers> answers;

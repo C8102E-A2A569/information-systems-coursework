@@ -122,6 +122,8 @@ CREATE TABLE IF NOT EXISTS "results" (
      "test_time" TIMESTAMP,
     "total_points" double precision,
     "status" VARCHAR(20),
+    "repetitions_count" INTEGER NOT NULL,
+    "group_id" INTEGER,
 
      CONSTRAINT "FK_results_user_login"
          FOREIGN KEY ("user_login")
@@ -129,7 +131,11 @@ CREATE TABLE IF NOT EXISTS "results" (
 
      CONSTRAINT "FK_results_test_id"
          FOREIGN KEY ("test_id")
-             REFERENCES "tests"("uuid_training")
+             REFERENCES "tests"("uuid_training"),
+
+    CONSTRAINT "FK_results_group_id"
+         FOREIGN KEY ("group_id")
+             REFERENCES "groups"("id")
 );
 
 CREATE TABLE IF NOT EXISTS "answers" (
