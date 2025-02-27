@@ -1,16 +1,51 @@
-.groups{
+.groups {
     position: fixed;
-    background-color: #5ee8ff;
+    background-color: #a42cf8; 
     width: 350px;
     height: 550px;
     right: 50px;
-    top:100px;overflow-y: auto;
+    top: 100px;
+    overflow-y: auto;
     border-radius: 8px;
-    border: 2px solid black;
+    color: #f6f4ee;
+    font-family: "Calibri", sans-serif;
 }
 
-.groups h2{
+
+.groups h2 {
     text-align: center;
     margin-top: 15px;
-    color: #110031;
+    color: #f6f4ee; 
+    font-size: 24px; 
+    font-family: "Calibri", sans-serif; 
+}
+
+.groups ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px;
+}
+
+.groups li {
+    background-color: #c573fb; 
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 21px; 
+    text-align: center;
+    color: #f6f4ee; 
+
+}
+
+.groups::-webkit-scrollbar {
+    width: 6px; /* Ширина скроллбара */
+}
+
+.groups::-webkit-scrollbar-thumb {
+    background: #c172f8; /* Цвет скроллбара, как у папок */
+    border-radius: 7px;
+}
+
+.groups::-webkit-scrollbar-thumb:hover {
+    background: #cf94f8; /* Цвет скроллбара при наведении */
 }

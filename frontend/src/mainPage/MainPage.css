@@ -47,10 +47,19 @@
 .folders .folder {
     background-color: #c573fb;
     border-radius: 8px;
-    padding: 5px 10px;
+    padding: 10px 10px;
     margin: 10px 20px;
     font-size: 20px;
     text-align: center;
+}
+
+
+.folders h2 {
+    margin-left: 114px;
+    margin-top: 15px;
+    color: #f6f4ee; 
+    font-size: 24px; 
+    font-family: "Calibri", sans-serif; 
 }
 
 .folders .folderIcon {

@@ -24,6 +24,7 @@ const MainPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [testTitle, setTestTitle] = useState('');
     const [withPoints, setWithPoints] = useState(false);
+    const [groups, setGroups] = useState([]);
 
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -308,6 +309,33 @@ const fetchTestsFromFolder = async (folderId) => {
             console.error('Ошибка при загрузке данных теста:', error);
         }
     };
+        // Метод для загрузки групп пользователя
+        const fetchUserGroups = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('Токен не найден');
+                    return;
+                }
+    
+                const response = await fetch('http://localhost:8080/groups/my', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении групп');
+                }
+    
+                const data = await response.json();
+                setGroups(data);
+            } catch (error) {
+                console.error('Ошибка при загрузке групп:', error.message);
+            }
+        };
 
 
     useEffect(() => {
@@ -323,6 +351,8 @@ const fetchTestsFromFolder = async (folderId) => {
                     await fetchSubfolders(parentFolderId);
                     await fetchTestsFromFolder(parentFolderId);
                 }
+                // Загрузка групп пользователя
+                await fetchUserGroups();
             } catch (error) {
                 console.error('Ошибка при загрузке данных:', error.message);
             }
@@ -340,6 +370,7 @@ const fetchTestsFromFolder = async (folderId) => {
             <UserProfile></UserProfile>
             <ul className="folders">
                 <div className="header">
+                <h2>Мои папки</h2>
                 {currentPath.length > 0 && (
                     <KeyboardBackspaceIcon className="back"
                                            onClick={() => handleBack(currentPath[currentPath.length - 1])}
@@ -405,7 +436,7 @@ const fetchTestsFromFolder = async (folderId) => {
                     </div>
                 )}
 
-            <Groups></Groups>
+            <Groups groups={groups}></Groups>
 
             {isModalOpen && (
                 <div className="modal">
