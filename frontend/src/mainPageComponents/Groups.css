@@ -1,11 +1,12 @@
 .groups {
     position: fixed;
-    background-color: #a42cf8; 
+    background-color: #5ee8ff;
     width: 350px;
     height: 550px;
     right: 50px;
     top: 100px;
     overflow-y: auto;
+    border: 2px solid black;
     border-radius: 8px;
     color: #f6f4ee;
     font-family: "Calibri", sans-serif;
@@ -15,9 +16,7 @@
 .groups h2 {
     text-align: center;
     margin-top: 15px;
-    color: #f6f4ee; 
-    font-size: 24px; 
-    font-family: "Calibri", sans-serif; 
+    color: #110031;
 }
 
 .groups ul {
@@ -27,25 +26,20 @@
 }
 
 .groups li {
-    background-color: #c573fb; 
+    background-color: #ffaf40;
+    border: 1px solid black;
     border-radius: 8px;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 21px; 
+    padding: 5px;
+    margin-top: 10px;
+    box-shadow: 0 1px 2px black;
+    font-size: 18px;
     text-align: center;
-    color: #f6f4ee; 
-
+    color: #00023a;
 }
 
+.groups li:hover{
+    box-shadow: 0 2px 3px black;
+}
 .groups::-webkit-scrollbar {
-    width: 6px; /* Ширина скроллбара */
-}
-
-.groups::-webkit-scrollbar-thumb {
-    background: #c172f8; /* Цвет скроллбара, как у папок */
-    border-radius: 7px;
-}
-
-.groups::-webkit-scrollbar-thumb:hover {
-    background: #cf94f8; /* Цвет скроллбара при наведении */
+    width: 0;
 }
