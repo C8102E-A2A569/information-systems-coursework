@@ -131,7 +131,7 @@
 }
 
 .tests::-webkit-scrollbar {
-    width: 6px;
+    width: 0;
 }
 
 .tests::-webkit-scrollbar-thumb {

@@ -6,13 +6,15 @@
     right: 50px;
     top: 100px;
     overflow-y: auto;
-    border: 2px solid black;
+    border: none;
     border-radius: 8px;
     color: #f6f4ee;
     font-family: "Calibri", sans-serif;
 }
 
-
+.groups:hover{
+    box-shadow: 0 0 7px #5ee8ff;
+}
 .groups h2 {
     text-align: center;
     margin-top: 15px;
@@ -42,4 +44,112 @@
 }
 .groups::-webkit-scrollbar {
     width: 0;
+}
+
+
+.group-list {
+    list-style: none;
+    padding: 0;
+}
+
+.group-item {
+    padding: 10px;
+    margin: 5px 0;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.delete-icon {
+    color: #00023a;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.delete-icon:hover {
+    opacity: 0.8;
+}
+
+.group-modal {
+    position: fixed;
+    top: 150px;
+    width: 300px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.edit-icon {
+    color: #2196F3;
+    cursor: pointer;
+}
+
+.members-list {
+    margin: 15px 0;
+}
+
+.member-item {
+    padding: 8px;
+    margin: 5px 0;
+    background: #f8f8f8;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.role {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный черный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

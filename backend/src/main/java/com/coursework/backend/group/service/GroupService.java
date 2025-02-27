@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,13 +45,14 @@ public class GroupService {
                     ("Пользователь не может получить список пользователей группы, поскольку он в ней не состоит");
 
         final var userGroupRoleList = userGroupRoleRepository.findAllByGroup(group);
-        return userGroupRoleList.stream().map(
+        final var usersList = userGroupRoleList.stream().map(
                 (userGroupRole) -> GroupUserDto.builder()
                         .name(userGroupRole.getUser().getName())
                         .login(userGroupRole.getUser().getLogin())
                         .role(userGroupRole.getRole())
                         .build()
         ).toList();
+        return usersList.stream().filter((u) -> !Objects.equals(u.getLogin(), user.getLogin())).toList();
     }
 
     @Transactional

@@ -236,20 +236,6 @@ const MainPage = () => {
             setFoundTest(null);
             setErrorMessage('Тест не найден');
         }
-        // Здесь можно добавить логику для отображения найденного теста
-        // navigate('/test-page', {
-        //     state: {
-        //         testInfo: {
-        //             id: testData.id,
-        //             name: testData.name,
-        //             points: testData.points
-        //         },
-        //         questions: testData.questions
-        //     }
-        // });
-        //
-        // closeSearchModal();
-
     };
 
     const handleCreateFolder = async () => {
