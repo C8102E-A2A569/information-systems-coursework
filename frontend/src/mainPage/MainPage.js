@@ -8,6 +8,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import UserProfile from "../mainPageComponents/UserProfile";
 import Groups from "../mainPageComponents/Groups";
 import {useNavigate} from "react-router-dom";
+import groups from "../mainPageComponents/Groups";
 
 const MainPage = () => {
     const [folders, setFolders] = useState([]);
@@ -25,6 +26,7 @@ const MainPage = () => {
     const [testTitle, setTestTitle] = useState('');
     const [withPoints, setWithPoints] = useState(false);
     const [foundTest, setFoundTest] = useState(null);
+    const [groups, setGroups] = useState([]);
 
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -318,6 +320,32 @@ const MainPage = () => {
             console.error('Ошибка при загрузке данных теста:', error);
         }
     };
+    const fetchUserGroups = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('Токен не найден');
+                return;
+            }
+
+            const response = await fetch('http://localhost:8080/groups/my', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при получении групп');
+            }
+
+            const data = await response.json();
+            setGroups(data);
+        } catch (error) {
+            console.error('Ошибка при загрузке групп:', error.message);
+        }
+    };
 
 
     useEffect(() => {
@@ -333,6 +361,7 @@ const MainPage = () => {
                     await fetchSubfolders(parentFolderId);
                     await fetchTestsFromFolder(parentFolderId);
                 }
+                await fetchUserGroups();
             } catch (error) {
                 console.error('Ошибка при загрузке данных:', error.message);
             }
@@ -415,7 +444,7 @@ const MainPage = () => {
                 </div>
             )}
 
-            <Groups></Groups>
+            <Groups groups={groups}></Groups>
 
             {isModalOpen && (
                 <div className="modal">
