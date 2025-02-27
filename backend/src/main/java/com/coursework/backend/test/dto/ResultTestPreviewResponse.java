@@ -17,4 +17,17 @@ public class ResultTestPreviewResponse {
     private String userLogin;
     private Results.Status status;
     private Double totalPoints;
+    private Long repetitionNumber;
+
+    public static ResultTestPreviewResponse fromResults(Results results) {
+        return ResultTestPreviewResponse.builder()
+                .testName(results.getTest().getName())
+                .testId(results.getTest().getId())
+                .userName(results.getUser().getName())
+                .userLogin(results.getUser().getLogin())
+                .status(results.getStatus())
+                .totalPoints(results.getTotalPoints())
+                .repetitionNumber(results.getRepetitionsCount())
+                .build();
+    }
 }

@@ -102,4 +102,9 @@ public class ResultsService {
 
     }
 
+    public List<ResultTestPreviewResponse> getMyResultsPreview() {
+        final var user = userService.getCurrentUser();
+        final var resultsList = resultsRepository.findAllByUser(user);
+        return resultsList.stream().map(ResultTestPreviewResponse::fromResults).toList();
+    }
 }

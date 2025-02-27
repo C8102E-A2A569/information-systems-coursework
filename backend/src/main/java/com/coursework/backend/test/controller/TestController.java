@@ -85,5 +85,4 @@ public class TestController {
     public List<GroupTestDto> getGroupTests(@PathVariable Long groupId) {
         return testService.getGroupTests(groupId);
     }
-
 }

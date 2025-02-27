@@ -21,10 +21,16 @@ public class ResultsController {
     public ResultTestResponse getMyResults(@PathVariable String trainingId, @PathVariable Long repetitionNumber) {
         return resultsService.getMyTestResult(trainingId, repetitionNumber);
     }
+
     @GetMapping("/group/{groupId}/test/{testId}")
     public List<ResultTestPreviewResponse> getTestResultsInGroup(
             @PathVariable Long groupId,
             @PathVariable String testId) {
         return resultsService.getTestResultsInGroup(testId, groupId);
+    }
+
+    @GetMapping("/my")
+    public List<ResultTestPreviewResponse> getMyTestResults() {
+        return resultsService.getMyResultsPreview();
     }
 }

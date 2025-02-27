@@ -24,4 +24,6 @@ public interface ResultsRepository extends JpaRepository<Results, Long> {
     Optional<Results> findByUserAndTestAndGroup(User user, Test test, Group group);
 
     Optional<Results> findByUserAndRepetitionsCountAndTest(User user, Long repetitionsCount, Test test);
+
+    List<Results> findAllByUser(User user);
 }
