@@ -18,7 +18,7 @@ public class ResultsService {
     private final UserService userService;
     private final AccessToTestsRepository accessToTestsRepository;
 
-    public ResultTestResponse getMyTestResult(String trainingId) {
+    public ResultTestResponse getMyTestResult(String trainingId, Long repetitionNumber) {
         final var user = userService.getCurrentUser();
         final var test = testRepository.findById(trainingId).orElseThrow(
                 () -> new IllegalArgumentException("Тест не найден")
@@ -28,7 +28,7 @@ public class ResultsService {
             throw new IllegalArgumentException("Тест недоступен для данного пользователя");
         }
 
-        final var result = resultsRepository.findByUserAndTest(user, test).orElseThrow(
+        final var result = resultsRepository.findByUserAndRepetitionsCountAndTest(user, repetitionNumber, test).orElseThrow(
                 () -> new IllegalArgumentException("Не удалось найти тест в пройденных у пользователя")
         );
 

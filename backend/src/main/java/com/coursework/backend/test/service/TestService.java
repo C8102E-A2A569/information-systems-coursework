@@ -345,35 +345,82 @@ public class TestService {
         testRepository.save(test);
     }
 
-//    TODO: Можно добавить более подходящие ошибки
-//    TODO: Добавить логику отслеживания количества попыток пользователя
-    public TestDto getTestForTraining(String id) {
-        final var currentUser = userService.getCurrentUser();
-        final var test = testRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Не удалось найти заданный тест")
-        );
-        if (!accessToTestsRepository.existsByUserAndTest(currentUser, test)) {
-            throw new IllegalArgumentException("Данный пользователь не имеет доступа для прохождения заданного теста");
-        }
+public TestDto getTestForTraining(String testId, Long groupId) {
+    final User user = userService.getCurrentUser();
+    final Test test = testRepository.findById(testId)
+            .orElseThrow(() -> new IllegalArgumentException("Тест не найден"));
 
-        final var results = Results.builder()
-                .startTime(LocalDateTime.now())
-                .user(currentUser)
-                .test(test)
-                .status(Results.Status.NOT_STARTED)
-                .build();
-        resultsRepository.save(results);
+    final Results lastResult = resultsRepository.findLastByUserLoginAndTestId(user.getLogin(), testId).orElse(null);
 
+    if (groupId != null) {
+        return handleGroupTest(user, test, groupId, lastResult);
+    } else {
+        return handleIndividualTest(user, test, lastResult);
+    }
+}
+
+    private TestDto handleGroupTest(User user, Test test, Long groupId, Results lastResult) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Группа не найдена"));
+
+        resultsRepository.findByUserAndTestAndGroup(user, test, group)
+                .filter(r -> r.getStatus() != Results.Status.NOT_STARTED)
+                .ifPresent(r -> { throw new IllegalArgumentException("Тест в группе можно пройти только один раз"); });
+
+        createOrUpdateResult(user, test, lastResult, group);
         return TestDto.fromTest(test);
     }
 
+    private TestDto handleIndividualTest(User user, Test test, Results lastResult) {
+        if (lastResult != null && lastResult.getStatus() != Results.Status.NOT_STARTED) {
+            checkIndividualAccess(user, test);
+        }
+
+        createOrUpdateResult(user, test, lastResult, null);
+        return TestDto.fromTest(test);
+    }
+
+    private void createOrUpdateResult(User user, Test test, Results lastResult, Group group) {
+        Long repetitions = calculateRepetitions(lastResult);
+
+        Results result = Results.builder()
+                .startTime(LocalDateTime.now())
+                .user(user)
+                .test(test)
+                .status(Results.Status.NOT_STARTED)
+                .repetitionsCount(repetitions)
+                .group(group)
+                .build();
+
+        cleanupPreviousResult(lastResult);
+        resultsRepository.save(result);
+    }
+
+    private void checkIndividualAccess(User user, Test test) {
+        if (!accessToTestsRepository.existsByUserAndTest(user, test)) {
+            throw new IllegalArgumentException("Индивидуальный тест можно пройти только один раз");
+        }
+    }
+
+    private Long calculateRepetitions(Results lastResult) {
+        if (lastResult == null) return 1L;
+        return lastResult.getStatus() == Results.Status.NOT_STARTED ?
+                lastResult.getRepetitionsCount() :
+                lastResult.getRepetitionsCount() + 1;
+    }
+
+    private void cleanupPreviousResult(Results lastResult) {
+        if (lastResult != null && lastResult.getStatus() == Results.Status.NOT_STARTED) {
+            resultsRepository.delete(lastResult);
+        }
+    }
+
 //    TODO: Прикрутить время прохождения теста (должно выполняться триггером)
-//    TODO: Добавить логику отслеживания количества попыток пользователя
-    public void checkTrainingResult(TestForCheck testForCheck) {
-        final var currentUser = userService.getCurrentUser();
+    public void checkTrainingResult(TestForCheck testForCheck, Long groupId) {
+        final var user = userService.getCurrentUser();
         final var test = testRepository.findById(testForCheck.getId()).orElseThrow(() ->
                 new IllegalArgumentException("Заданного теста не найдено"));
-        if (!accessToTestsRepository.existsByUserAndTest(currentUser, test)) {
+        if (!accessToTestsRepository.existsByUserAndTest(user, test)) {
             throw new IllegalArgumentException("Данный пользователь не имеет доступа для прохождения заданного теста");
         }
 //        Проверка на количество ответов
@@ -388,9 +435,19 @@ public class TestService {
         Integer questionsPointsSum = 0;
         Integer correctQuestionsPointsSum = 0;
         Boolean isContainsTextAnswers = false;
-        final var results = resultsRepository.findByUserAndTest(currentUser, test).orElseThrow(
-                () -> new IllegalArgumentException("Пользователь не начинал проходить данный тест")
-        );
+        final Results results;
+        if (groupId == null) {
+            results = resultsRepository.findLastByUserLoginAndTestId(user.getLogin(), test.getId()).orElseThrow(
+                    () -> new IllegalArgumentException("Пользователь не начинал проходить данный тест")
+            );
+        } else {
+            final var group = groupRepository.findById(groupId).orElseThrow(
+                    () -> new IllegalArgumentException("Такой группы не существует")
+            );
+            results = resultsRepository.findByUserAndTestAndGroup(user, test, group).orElseThrow(
+                    () -> new IllegalArgumentException("Пользователь не начинал проходить данный тест")
+            );
+        }
 
         if (results.getStatus() != Results.Status.NOT_STARTED)
             throw new IllegalArgumentException("Пользователь уже завершил прохождение данного теста");

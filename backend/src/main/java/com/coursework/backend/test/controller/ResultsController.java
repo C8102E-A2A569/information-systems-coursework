@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResultsController {
     private final ResultsService resultsService;
 
-    @GetMapping("/my/{trainingId}")
-    public ResultTestResponse getMyResults(@PathVariable String trainingId) {
-        return resultsService.getMyTestResult(trainingId);
+    @GetMapping("/my/{trainingId}/{repetitionNumber}")
+    public ResultTestResponse getMyResults(@PathVariable String trainingId, @PathVariable Long repetitionNumber) {
+        return resultsService.getMyTestResult(trainingId, repetitionNumber);
     }
 }

@@ -34,9 +34,14 @@ public class ResultTestResponse {
 
     private Double testResultPoints;
 
+    private Long repetitionNumber;
+
+    private String groupName;
+
     private List<QuestionResult> questions;
 
     public static ResultTestResponse fromTestAndResult(Test test, Results result) {
+        final var groupName = result.getGroup() != null ? result.getGroup().getName() : null;
         final var questions = result.getAnswers()
                 .stream()
                 .map((answer) -> QuestionResult.fromQuestionAndAnswer(answer.getQuestion(), answer))
@@ -53,8 +58,9 @@ public class ResultTestResponse {
                 .testTotalPoints(test.getPoints())
                 .testResultPoints(result.getTotalPoints())
                 .questions(questions)
+                .repetitionNumber(result.getRepetitionsCount())
+                .groupName(groupName)
                 .build();
-
     }
 
     @Data

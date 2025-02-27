@@ -67,13 +67,13 @@ public class TestController {
     }
 
     @GetMapping("/training/{trainingId}")
-    public TestDto getTestForTraining(@PathVariable String trainingId) {
-        return testService.getTestForTraining(trainingId);
+    public TestDto getTestForTraining(@PathVariable String trainingId, @RequestParam(defaultValue = "") Long groupId) {
+        return testService.getTestForTraining(trainingId, groupId);
     }
 
     @PostMapping("training/send")
-    public void checkTrainingResult(@RequestBody TestForCheck testForCheck) {
-        testService.checkTrainingResult(testForCheck);
+    public void checkTrainingResult(@RequestBody TestForCheck testForCheck, @RequestParam(defaultValue = "") Long groupId) {
+        testService.checkTrainingResult(testForCheck, groupId);
     }
 
     @GetMapping("training/search/{trainingId}")
